@@ -1,0 +1,17 @@
+# Dependency directories
+node_modules
+
+# Build outputs
+dist
+build
+.next
+.turbo
+
+# Test coverage
+coverage
+
+# Lock files
+pnpm-lock.yaml
+
+# Minified files
+*.min.js

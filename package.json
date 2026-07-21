@@ -1,0 +1,26 @@
+{
+  "name": "openwitness",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Open-source platform for preserving, organizing, and verifying evidence from public events.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.15.1",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.15.1"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "format": "prettier --write .",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.1.10",
+    "turbo": "^2.10.5",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
