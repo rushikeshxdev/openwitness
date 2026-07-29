@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: #09090B;
+  color: #FAFAFA;
+}
+
+/* Glassmorphism utility classes */
+.glass-light {
+  background-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-medium {
+  background-color: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-strong {
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563EB;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Performance optimizations */
+
+/* 
+  GPU acceleration for commonly animated elements
+  Using transform: translateZ(0) or will-change creates a new compositing layer
+  Note: will-change should be used sparingly and only on actively animating elements
+*/
+
+/* Apply GPU acceleration to animated cards */
+.animated-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize scroll performance */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Use containment for isolated components to improve render performance */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+/* Optimize for animations - only apply to elements that will animate */
+.will-animate-transform {
+  will-change: transform;
+}
+
+.will-animate-opacity {
+  will-change: opacity;
+}
+
+.will-animate-transform-opacity {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes */
+.animation-complete {
+  will-change: auto;
+}
+
+/* Hardware acceleration for transforms */
+.hw-accelerate {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
