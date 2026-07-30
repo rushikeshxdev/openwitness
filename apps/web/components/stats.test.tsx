@@ -26,6 +26,7 @@ vi.mock("framer-motion", async () => {
       destroy: vi.fn(),
     })),
     useInView: vi.fn(() => true),
+    MotionConfig: ({ children }: any) => children,
   };
 });
 
@@ -83,25 +84,23 @@ describe("Stats", () => {
 
     it("centers stat content", () => {
       const { container } = render(<Stats {...mockStats} />);
-      const statCards = container.querySelectorAll(".text-center");
-      
-      expect(statCards.length).toBeGreaterThanOrEqual(3);
+      // Cards use flex column layout for icon + value + label
+      const cards = container.querySelectorAll(".flex.flex-col");
+      expect(cards.length).toBeGreaterThanOrEqual(3);
     });
   });
 
   describe("Typography", () => {
     it("applies large font size to stat values", () => {
       const { container } = render(<Stats {...mockStats} />);
-      // Updated classes: text-3xl md:text-4xl lg:text-5xl
-      const statValues = container.querySelectorAll(".lg\\:text-5xl");
+      const statValues = container.querySelectorAll(".md\\:text-4xl");
       
       expect(statValues.length).toBe(3);
     });
 
     it("applies body text style to labels", () => {
       const { container } = render(<Stats {...mockStats} />);
-      // Updated classes: text-base md:text-body
-      const labels = container.querySelectorAll(".md\\:text-body");
+      const labels = container.querySelectorAll(".md\\:text-base");
       
       expect(labels.length).toBe(3);
     });
@@ -119,8 +118,7 @@ describe("Stats", () => {
   describe("Animation", () => {
     it("initializes with animated number components", () => {
       const { container } = render(<Stats {...mockStats} />);
-      // Updated classes: lg:text-5xl
-      const statValues = container.querySelectorAll(".lg\\:text-5xl");
+      const statValues = container.querySelectorAll(".md\\:text-4xl");
       
       // Should render number containers for animation
       expect(statValues.length).toBe(3);

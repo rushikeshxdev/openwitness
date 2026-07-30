@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GlassCard Component Tests
  * 
  * Tests for the GlassCard component variants, hover effects, and interactions
@@ -6,6 +6,7 @@
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { GlassCard } from "./glass-card";
 
 describe("GlassCard", () => {
@@ -24,20 +25,20 @@ describe("GlassCard", () => {
 
     it("renders with default variant", () => {
       render(<GlassCard>Default Card</GlassCard>);
-      const card = screen.getByText("Default Card").parentElement;
+      const card = screen.getByText("Default Card");
       expect(card).toHaveClass("bg-white/6", "backdrop-blur-md", "border-white/10");
     });
 
     it("renders with hover-lift variant", () => {
       render(<GlassCard variant="hover-lift">Lift Card</GlassCard>);
-      const card = screen.getByText("Lift Card").parentElement;
+      const card = screen.getByText("Lift Card");
       expect(card).toHaveClass("bg-white/6");
       expect(card).toBeInTheDocument();
     });
 
     it("renders with hover-tilt variant", () => {
       render(<GlassCard variant="hover-tilt">Tilt Card</GlassCard>);
-      const card = screen.getByText("Tilt Card").parentElement;
+      const card = screen.getByText("Tilt Card");
       expect(card).toBeInTheDocument();
     });
   });
@@ -45,25 +46,25 @@ describe("GlassCard", () => {
   describe("Base Glassmorphism Styling", () => {
     it("applies glassmorphism background styles", () => {
       render(<GlassCard>Glass</GlassCard>);
-      const card = screen.getByText("Glass").parentElement;
+      const card = screen.getByText("Glass");
       expect(card).toHaveClass("bg-white/6");
     });
 
     it("applies backdrop blur", () => {
       render(<GlassCard>Blur</GlassCard>);
-      const card = screen.getByText("Blur").parentElement;
+      const card = screen.getByText("Blur");
       expect(card).toHaveClass("backdrop-blur-md");
     });
 
     it("applies border styling", () => {
       render(<GlassCard>Border</GlassCard>);
-      const card = screen.getByText("Border").parentElement;
+      const card = screen.getByText("Border");
       expect(card).toHaveClass("border", "border-white/10");
     });
 
     it("applies rounded corners", () => {
       render(<GlassCard>Rounded</GlassCard>);
-      const card = screen.getByText("Rounded").parentElement;
+      const card = screen.getByText("Rounded");
       expect(card).toHaveClass("rounded-xl");
     });
   });
@@ -71,7 +72,7 @@ describe("GlassCard", () => {
   describe("Variant Behavior", () => {
     it("applies default variant with no hover effects", () => {
       render(<GlassCard variant="default">Default</GlassCard>);
-      const card = screen.getByText("Default").parentElement;
+      const card = screen.getByText("Default");
       
       // Should still have base styles
       expect(card).toHaveClass("bg-white/6");
@@ -80,7 +81,7 @@ describe("GlassCard", () => {
 
     it("hover-lift variant exists", () => {
       render(<GlassCard variant="hover-lift">Lift</GlassCard>);
-      const card = screen.getByText("Lift").parentElement;
+      const card = screen.getByText("Lift");
       
       // Card should be rendered with motion component
       expect(card).toBeInTheDocument();
@@ -88,7 +89,7 @@ describe("GlassCard", () => {
 
     it("hover-tilt variant exists", () => {
       render(<GlassCard variant="hover-tilt">Tilt</GlassCard>);
-      const card = screen.getByText("Tilt").parentElement;
+      const card = screen.getByText("Tilt");
       
       // Card should be rendered with motion component
       expect(card).toBeInTheDocument();
@@ -97,14 +98,14 @@ describe("GlassCard", () => {
 
   describe("Interactions", () => {
     it("calls onClick handler when clicked", () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <GlassCard onClick={handleClick}>
           Clickable Card
         </GlassCard>
       );
       
-      const card = screen.getByText("Clickable Card").parentElement;
+      const card = screen.getByText("Clickable Card");
       if (card) {
         fireEvent.click(card);
         expect(handleClick).toHaveBeenCalledTimes(1);
@@ -112,26 +113,26 @@ describe("GlassCard", () => {
     });
 
     it("applies cursor-pointer class when onClick is provided", () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <GlassCard onClick={handleClick}>
           Click me
         </GlassCard>
       );
       
-      const card = screen.getByText("Click me").parentElement;
+      const card = screen.getByText("Click me");
       expect(card).toHaveClass("cursor-pointer");
     });
 
     it("does not apply cursor-pointer when no onClick", () => {
       render(<GlassCard>No click</GlassCard>);
-      const card = screen.getByText("No click").parentElement;
+      const card = screen.getByText("No click");
       expect(card).not.toHaveClass("cursor-pointer");
     });
 
     it("handles mouse move events for tilt variant", () => {
       render(<GlassCard variant="hover-tilt">Tilt Me</GlassCard>);
-      const card = screen.getByText("Tilt Me").parentElement;
+      const card = screen.getByText("Tilt Me");
       
       if (card) {
         // Simulate mouse move
@@ -142,7 +143,7 @@ describe("GlassCard", () => {
 
     it("handles mouse leave events for tilt variant", () => {
       render(<GlassCard variant="hover-tilt">Tilt Me</GlassCard>);
-      const card = screen.getByText("Tilt Me").parentElement;
+      const card = screen.getByText("Tilt Me");
       
       if (card) {
         fireEvent.mouseMove(card, { clientX: 100, clientY: 100 });
@@ -153,7 +154,7 @@ describe("GlassCard", () => {
 
     it("does not handle mouse move for non-tilt variants", () => {
       render(<GlassCard variant="hover-lift">Lift Me</GlassCard>);
-      const card = screen.getByText("Lift Me").parentElement;
+      const card = screen.getByText("Lift Me");
       
       if (card) {
         // Should not error on mouse move
@@ -166,13 +167,13 @@ describe("GlassCard", () => {
   describe("Custom Styling", () => {
     it("accepts and applies custom className", () => {
       render(<GlassCard className="custom-class">Custom</GlassCard>);
-      const card = screen.getByText("Custom").parentElement;
+      const card = screen.getByText("Custom");
       expect(card).toHaveClass("custom-class");
     });
 
     it("merges custom className with default styles", () => {
       render(<GlassCard className="max-w-md">Styled</GlassCard>);
-      const card = screen.getByText("Styled").parentElement;
+      const card = screen.getByText("Styled");
       expect(card).toHaveClass("max-w-md");
       expect(card).toHaveClass("bg-white/6"); // Base style preserved
     });
@@ -183,7 +184,7 @@ describe("GlassCard", () => {
           Override
         </GlassCard>
       );
-      const card = screen.getByText("Override").parentElement;
+      const card = screen.getByText("Override");
       // Custom classes should be present
       expect(card).toHaveClass("p-8");
     });
@@ -271,3 +272,4 @@ describe("GlassCard", () => {
     });
   });
 });
+

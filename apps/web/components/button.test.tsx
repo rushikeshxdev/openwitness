@@ -6,6 +6,7 @@
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { Button } from "./button";
 import { ArrowRight, Download } from "lucide-react";
 
@@ -82,7 +83,7 @@ describe("Button", () => {
 
   describe("Interactions", () => {
     it("calls onClick handler when clicked", () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Click me</Button>);
       
       const button = screen.getByRole("button");
@@ -92,7 +93,7 @@ describe("Button", () => {
     });
 
     it("does not call onClick when disabled", () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <Button onClick={handleClick} disabled>
           Disabled

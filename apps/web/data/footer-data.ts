@@ -1,37 +1,32 @@
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
-import { FooterLinkColumn, FooterSocialLink } from "@/components/footer";
-
-/**
- * Sample footer data for the landing page
- * Contains link columns, social links, and copyright information
- */
+import { Github, Twitter, Linkedin } from "lucide-react";
+import type { FooterLinkColumn, FooterSocialLink } from "@/components/footer";
 
 export const footerLinkColumns: FooterLinkColumn[] = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "#features" },
-      { label: "How it Works", href: "#how-it-works" },
-      { label: "Use Cases", href: "#use-cases" },
-      { label: "Pricing", href: "#pricing" },
+      { label: "Explore Events", href: "#events" },
+      { label: "Live Map", href: "#map" },
+      {
+        label: "Report Incident",
+        href: "mailto:report@openwitness.org?subject=Incident%20Report",
+      },
     ],
   },
   {
-    title: "Resources",
+    title: "Platform",
     links: [
-      { label: "Documentation", href: "/docs" },
-      { label: "API Reference", href: "/api" },
-      { label: "Guides", href: "/guides" },
-      { label: "Community", href: "/community" },
+      { label: "About", href: "#about" },
+      { label: "Organizations", href: "#organizations" },
+      { label: "Documentation", href: "https://github.com/openwitness" },
     ],
   },
   {
-    title: "Company",
+    title: "Legal",
     links: [
-      { label: "About", href: "/about" },
-      { label: "Blog", href: "/blog" },
-      { label: "Careers", href: "/careers" },
-      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "#privacy" },
+      { label: "Terms", href: "#terms" },
+      { label: "License", href: "https://github.com/openwitness" },
     ],
   },
 ];
@@ -52,11 +47,7 @@ export const footerSocialLinks: FooterSocialLink[] = [
     url: "https://linkedin.com/company/openwitness",
     icon: Linkedin,
   },
-  {
-    platform: "Email",
-    url: "mailto:contact@openwitness.org",
-    icon: Mail,
-  },
 ];
 
-export const footerCopyright = "© 2024 OpenWitness. All rights reserved.";
+export const footerCopyright =
+  "© 2026 OpenWitness. Open source software for truth preservation.";

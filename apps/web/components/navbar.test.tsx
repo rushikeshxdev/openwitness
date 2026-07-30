@@ -203,16 +203,23 @@ describe("Navbar", () => {
       const { container } = render(
         <Navbar links={mockLinks} className="custom-class" />
       );
-      const nav = container.querySelector("nav");
-      expect(nav?.className).toContain("custom-class");
+      const header = container.querySelector("header");
+      expect(header?.className).toContain("custom-class");
     });
 
     it("should have fixed positioning", () => {
       const { container } = render(<Navbar links={mockLinks} />);
+      const header = container.querySelector("header");
+      expect(header?.className).toContain("fixed");
+      expect(header?.className).toContain("top-0");
+      expect(header?.className).toContain("z-50");
+    });
+
+    it("should render as a floating pill glass bar", () => {
+      const { container } = render(<Navbar links={mockLinks} />);
       const nav = container.querySelector("nav");
-      expect(nav?.className).toContain("fixed");
-      expect(nav?.className).toContain("top-0");
-      expect(nav?.className).toContain("z-50");
+      expect(nav?.className).toContain("rounded-full");
+      expect(nav?.className).toContain("backdrop-blur-xl");
     });
   });
 });

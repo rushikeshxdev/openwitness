@@ -1,34 +1,19 @@
 "use client";
 
 import { GlassCard } from "./glass-card";
-import { motion, useSpring, useInView } from "framer-motion";
+import { motion, useSpring, useInView, MotionConfig } from "framer-motion";
 import { useEffect, useRef, memo } from "react";
 import { staggerContainerFast } from "@/lib/animations";
+import { cn } from "@/lib/utils";
+import {
+  FolderOpen,
+  CalendarDays,
+  MapPin,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
-/**
- * Stats component - Animated numeric statistics with labels
- * Optimized with React.memo to prevent unnecessary re-renders
- * 
- * **Validates: Requirements 1.6, 1.7, 12.4**
- * 
- * Features:
- * - Grid layout with responsive columns (3 on desktop, 1-2 on mobile)
- * - Animates from 0 to target value using useSpring
- * - Triggers animation when stats enter viewport using useInView
- * - Each stat wrapped in GlassCard component
- * - Number typography: 48px bold, label: 18px regular
- * 
- * @example
- * ```tsx
- * <Stats
- *   stats={[
- *     { label: "Active Events", value: 1247 },
- *     { label: "Evidence Items", value: 48392, suffix: "+" },
- *     { label: "Global Contributors", value: 15234 }
- *   ]}
- * />
- * ```
- */
+export type StatIconKey = "folder" | "calendar" | "map-pin" | "users";
 
 export interface Stat {
   label: string;
@@ -36,11 +21,27 @@ export interface Stat {
   suffix?: string;
   prefix?: string;
   increment?: string;
+  icon?: LucideIcon | StatIconKey;
 }
 
 export interface StatsProps {
   stats: Stat[];
-  animationDuration?: number;
+  /** Layout mode for parent grids */
+  layout?: "grid" | "contents";
+  className?: string;
+}
+
+const iconMap: Record<StatIconKey, LucideIcon> = {
+  folder: FolderOpen,
+  calendar: CalendarDays,
+  "map-pin": MapPin,
+  users: Users,
+};
+
+function resolveIcon(icon?: Stat["icon"]): LucideIcon | null {
+  if (!icon) return null;
+  if (typeof icon === "string") return iconMap[icon] ?? null;
+  return icon;
 }
 
 const AnimatedNumber = memo(function AnimatedNumber({
@@ -58,7 +59,6 @@ const AnimatedNumber = memo(function AnimatedNumber({
     stiffness: 100,
     damping: 30,
   });
-
   const displayValue = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -70,58 +70,94 @@ const AnimatedNumber = memo(function AnimatedNumber({
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
       if (displayValue.current) {
-        const formatted = Math.floor(latest).toLocaleString();
-        displayValue.current.textContent = `${prefix}${formatted}${suffix}`;
+        displayValue.current.textContent = `${prefix}${Math.floor(latest).toLocaleString()}${suffix}`;
       }
     });
-
     return unsubscribe;
   }, [prefix, suffix, springValue]);
 
-  return <span ref={displayValue}>0</span>;
+  return (
+    <span ref={displayValue} suppressHydrationWarning>
+      {prefix}0{suffix}
+    </span>
+  );
 });
 
-export function Stats({ stats, animationDuration = 2 }: StatsProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+const StatCard = memo(function StatCard({
+  stat,
+  index,
+  isInView,
+}: {
+  stat: Stat;
+  index: number;
+  isInView: boolean;
+}) {
+  const Icon = resolveIcon(stat.icon);
 
   return (
     <motion.div
-      ref={ref}
-      variants={staggerContainerFast}
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto"
+      initial={{ opacity: 0, y: 16 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+      transition={{ duration: 0.35, delay: index * 0.08 }}
+      className="h-full"
     >
-      {stats.map((stat, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{
-            duration: 0.4,
-            delay: index * 0.1 + 0.8, // Start after hero content
-          }}
-        >
-          <GlassCard
-            variant="default"
-            className="p-6 sm:p-8 text-center hover:bg-white/10 transition-colors bg-black/40"
-          >
-            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-2">
-              <AnimatedNumber
-                value={stat.value}
-                prefix={stat.prefix}
-                suffix={stat.suffix}
-                isInView={isInView}
-              />
-            </div>
-            <div className="text-base md:text-body text-text-secondary mb-1">{stat.label}</div>
-            {stat.increment && (
-              <div className="text-sm text-brand-blue-primary">{stat.increment}</div>
-            )}
-          </GlassCard>
-        </motion.div>
-      ))}
+      <GlassCard
+        variant="hover-lift"
+        className="p-5 sm:p-6 h-full flex flex-col bg-black/40"
+      >
+        {Icon && (
+          <div className="mb-4 text-brand-blue-primary">
+            <Icon className="w-6 h-6" aria-hidden="true" />
+          </div>
+        )}
+        <div className="text-3xl md:text-4xl font-bold text-text-primary mb-1 tabular-nums">
+          <AnimatedNumber
+            value={stat.value}
+            prefix={stat.prefix}
+            suffix={stat.suffix}
+            isInView={isInView}
+          />
+        </div>
+        <div className="text-sm md:text-base text-text-secondary mb-2">
+          {stat.label}
+        </div>
+        {stat.increment && (
+          <div className="mt-auto text-sm font-medium text-brand-blue-primary">
+            {stat.increment}
+          </div>
+        )}
+      </GlassCard>
     </motion.div>
+  );
+});
+
+export function Stats({ stats, layout = "grid", className }: StatsProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+
+  return (
+    <MotionConfig reducedMotion="user">
+      <motion.div
+        ref={ref}
+        variants={staggerContainerFast}
+        initial="initial"
+        animate={isInView ? "animate" : "initial"}
+        className={cn(
+          layout === "grid" &&
+            "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto",
+          layout === "contents" && "contents",
+          className
+        )}
+      >
+        {stats.map((stat, index) => (
+          <StatCard
+            key={stat.label}
+            stat={stat}
+            index={index}
+            isInView={isInView}
+          />
+        ))}
+      </motion.div>
+    </MotionConfig>
   );
 }

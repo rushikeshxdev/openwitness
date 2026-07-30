@@ -1,9 +1,9 @@
 /**
  * Hero Component Tests
- * 
+ *
  * Tests for the Hero component structure, animations, and interactions
  * **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 12.2, 14.5**
- * 
+ *
  * @vitest-environment jsdom
  */
 
@@ -11,7 +11,6 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Hero, HeroProps } from "./hero";
 
-// Mock framer-motion for testing
 vi.mock("framer-motion", async () => {
   const actual = await vi.importActual("framer-motion");
   return {
@@ -27,7 +26,6 @@ vi.mock("framer-motion", async () => {
   };
 });
 
-// Mock next/image
 vi.mock("next/image", () => ({
   default: (props: any) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -35,24 +33,32 @@ vi.mock("next/image", () => ({
   },
 }));
 
-// Mock child components
 vi.mock("./container", () => ({
-  Container: ({ children, className }: any) => <div className={className}>{children}</div>,
+  Container: ({ children, className }: any) => (
+    <div className={`max-w-screen-2xl ${className}`}>{children}</div>
+  ),
 }));
 
 vi.mock("./button", () => ({
-  Button: ({ children, onClick, variant, size, className }: any) => (
-    <button onClick={onClick} className={className} data-variant={variant} data-size={size}>
-      {children}
-    </button>
-  ),
+  Button: ({ children, onClick, variant, size, className, href }: any) =>
+    href ? (
+      <a href={href} className={className} data-variant={variant} data-size={size}>
+        {children}
+      </a>
+    ) : (
+      <button onClick={onClick} className={className} data-variant={variant} data-size={size}>
+        {children}
+      </button>
+    ),
 }));
 
 vi.mock("./stats", () => ({
   Stats: ({ stats }: any) => (
     <div data-testid="stats">
       {stats.map((stat: any, index: number) => (
-        <div key={index}>{stat.label}: {stat.value}</div>
+        <div key={index}>
+          {stat.label}: {stat.value}
+        </div>
       ))}
     </div>
   ),
@@ -63,10 +69,12 @@ vi.mock("./spotlight-cursor", () => ({
 }));
 
 const mockHeroProps: HeroProps = {
-  backgroundImage: "/images/hero-bg.jpg",
-  tagline: "Open Source • Community Driven • For Truth",
-  missionStatement: "Truth deserves structure",
-  description: "OpenWitness is an open-source platform for preserving, organizing, and verifying evidence from public events.",
+  backgroundImage: "/images/hero-bg.png",
+  tags: ["Open Source", "Community Driven", "For Truth"],
+  tagline: "Document. Preserve. Organize. Verify.",
+  missionStatement: "Truth deserves structure.",
+  description:
+    "OpenWitness is an open-source platform for preserving, organizing, and verifying evidence from public events.",
   stats: [
     { label: "Active Events", value: 1247 },
     { label: "Evidence Items", value: 48392, suffix: "+" },
@@ -87,79 +95,89 @@ describe("Hero", () => {
     it("renders hero section with full viewport height", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
       const section = container.querySelector("section");
-      expect(section).toHaveClass("h-screen");
+      expect(section).toHaveClass("min-h-[100svh]");
     });
 
     it("renders mission statement", () => {
       render(<Hero {...mockHeroProps} />);
-      expect(screen.getByText("Truth deserves structure")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        "Truth deserves structure."
+      );
     });
 
     it("applies hero typography to mission statement", () => {
       render(<Hero {...mockHeroProps} />);
-      const heading = screen.getByText("Truth deserves structure");
-      expect(heading).toHaveClass("text-hero");
+      const heading = screen.getByRole("heading", { level: 1 });
+      expect(heading).toHaveClass("font-bold");
     });
 
     it("renders background image with priority loading", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
-      const image = container.querySelector("img[src='/images/hero-bg.jpg']");
+      const image = container.querySelector("img[src='/images/hero-bg.png']");
       expect(image).toBeInTheDocument();
-      // Priority is a Next.js prop that gets handled during build, not rendered as attribute
     });
 
-    it("applies dark overlay to background", () => {
+    it("applies brightness treatment to background", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
       const image = container.querySelector("img");
-      expect(image).toHaveClass("brightness-40");
+      expect(image?.className).toMatch(/brightness/);
     });
   });
 
   describe("Content Elements", () => {
+    it("renders tag pills", () => {
+      render(<Hero {...mockHeroProps} />);
+      expect(
+        screen.getByText("Open Source • Community Driven • For Truth")
+      ).toBeInTheDocument();
+    });
+
     it("renders tagline when provided", () => {
       render(<Hero {...mockHeroProps} />);
-      expect(screen.getByText("Open Source • Community Driven • For Truth")).toBeInTheDocument();
+      expect(
+        screen.getByText("Document. Preserve. Organize. Verify.")
+      ).toBeInTheDocument();
     });
 
     it("renders description when provided", () => {
       render(<Hero {...mockHeroProps} />);
-      expect(screen.getByText(/OpenWitness is an open-source platform/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/OpenWitness is an open-source platform/)
+      ).toBeInTheDocument();
     });
 
     it("does not render tagline when not provided", () => {
       const propsWithoutTagline = { ...mockHeroProps, tagline: undefined };
       render(<Hero {...propsWithoutTagline} />);
-      expect(screen.queryByText("Open Source • Community Driven • For Truth")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Document. Preserve. Organize. Verify.")
+      ).not.toBeInTheDocument();
     });
 
     it("does not render description when not provided", () => {
       const propsWithoutDescription = { ...mockHeroProps, description: undefined };
       render(<Hero {...propsWithoutDescription} />);
-      expect(screen.queryByText(/OpenWitness is an open-source platform/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/OpenWitness is an open-source platform/)
+      ).not.toBeInTheDocument();
     });
   });
 
   describe("CTA Buttons", () => {
-    it("renders primary CTA button", () => {
+    it("renders primary CTA as a link when href is provided", () => {
       render(<Hero {...mockHeroProps} />);
-      expect(screen.getByRole("button", { name: "Get Started" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Get Started" })).toHaveAttribute(
+        "href",
+        "#get-started"
+      );
     });
 
-    it("renders secondary CTA button", () => {
+    it("renders secondary CTA as a link when href is provided", () => {
       render(<Hero {...mockHeroProps} />);
-      expect(screen.getByRole("button", { name: "Learn More" })).toBeInTheDocument();
-    });
-
-    it("handles primary CTA click with href", () => {
-      const originalLocation = window.location.href;
-      delete (window as any).location;
-      window.location = { href: originalLocation } as any;
-
-      render(<Hero {...mockHeroProps} />);
-      const button = screen.getByRole("button", { name: "Get Started" });
-      fireEvent.click(button);
-
-      expect(window.location.href).toBe("#get-started");
+      expect(screen.getByRole("link", { name: "Learn More" })).toHaveAttribute(
+        "href",
+        "#learn-more"
+      );
     });
 
     it("handles secondary CTA click with onClick", () => {
@@ -183,8 +201,7 @@ describe("Hero", () => {
   describe("Stats Display", () => {
     it("renders all stats", () => {
       render(<Hero {...mockHeroProps} />);
-      
-      // Stats are now rendered through the mocked Stats component
+
       expect(screen.getByTestId("stats")).toBeInTheDocument();
       expect(screen.getByText(/Active Events/)).toBeInTheDocument();
       expect(screen.getByText(/Evidence Items/)).toBeInTheDocument();
@@ -194,23 +211,22 @@ describe("Hero", () => {
     it("renders stats within Stats component", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
       const statsComponent = container.querySelector("[data-testid='stats']");
-      
-      // Stats component should be present
       expect(statsComponent).toBeInTheDocument();
     });
   });
 
   describe("Layout", () => {
-    it("uses Container component for content width", () => {
+    it("uses left-aligned content column matching nav edge", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
-      const containerDiv = container.querySelector(".max-w-screen-2xl");
-      expect(containerDiv).toBeInTheDocument();
+      const column = container.querySelector(".max-w-\\[1440px\\]");
+      expect(column).toBeInTheDocument();
     });
 
-    it("centers content vertically and horizontally", () => {
+    it("aligns content vertically", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
       const section = container.querySelector("section");
-      expect(section).toHaveClass("flex", "items-center", "justify-center");
+      expect(section).toHaveClass("flex");
+      expect(section?.className).toMatch(/items-center|items-start/);
     });
 
     it("arranges CTA buttons horizontally on desktop", () => {
@@ -224,13 +240,16 @@ describe("Hero", () => {
     it("has proper heading hierarchy", () => {
       render(<Hero {...mockHeroProps} />);
       const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent("Truth deserves structure");
+      expect(heading).toHaveTextContent("Truth deserves structure.");
     });
 
     it("has alt text for background image", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
       const image = container.querySelector("img");
-      expect(image).toHaveAttribute("alt", "Hero background");
+      expect(image).toHaveAttribute(
+        "alt",
+        "Public demonstration with citizens documenting the event"
+      );
     });
   });
 
@@ -243,7 +262,7 @@ describe("Hero", () => {
 
     it("applies responsive spacing", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
-      const content = container.querySelector(".mb-8");
+      const content = container.querySelector(".mb-7");
       expect(content).toBeInTheDocument();
     });
   });

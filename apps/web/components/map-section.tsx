@@ -5,7 +5,6 @@ import { useRef, useState } from "react";
 import { Container } from "./container";
 import { SectionTitle } from "./section-title";
 import { fadeIn } from "@/lib/animations";
-import { SpotlightCursor } from "./spotlight-cursor";
 
 /**
  * MapSection component - Interactive world map with event markers
@@ -102,16 +101,20 @@ export function MapSection({
 
   return (
     <section
+      id="map"
       ref={ref}
-      className="py-20 md:py-32 bg-background-primary relative overflow-hidden"
+      className="py-20 md:py-32 bg-background-primary relative overflow-hidden scroll-mt-24"
+      aria-labelledby="map-section-title"
     >
-      {/* Spotlight effect */}
-      <SpotlightCursor size={700} opacity={0.12} color="rgba(56, 189, 248, 0.25)" />
-
       <Container size="xl">
         {/* Section Header */}
         <div className="mb-12">
-          <SectionTitle title={title} subtitle={subtitle} alignment="center" />
+          <SectionTitle
+            id="map-section-title"
+            title={title}
+            subtitle={subtitle}
+            alignment="center"
+          />
         </div>
 
         {/* Map Container */}

@@ -521,7 +521,9 @@ export function prefersReducedMotion(): boolean {
  * </motion.div>
  * ```
  */
-export function accessibleTransition(transition: any): any {
+export function accessibleTransition<T extends Record<string, unknown>>(
+  transition: T
+): T | { duration: number } {
   if (prefersReducedMotion()) {
     return { duration: 0.01 };
   }

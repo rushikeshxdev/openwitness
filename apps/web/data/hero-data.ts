@@ -1,10 +1,10 @@
 /**
  * Static data for Hero section
- * Contains mission statement, stats, CTA buttons, and background image
  */
 
 export interface HeroData {
   backgroundImage: string;
+  tags: string[];
   tagline?: string;
   missionStatement: string;
   description?: string;
@@ -25,31 +25,19 @@ export interface HeroData {
 }
 
 export const heroData: HeroData = {
-  backgroundImage: "/images/hero-bg.jpg",
-  tagline: "Open Source • Community Driven • For Truth",
-  missionStatement: "Truth deserves structure",
-  description: "OpenWitness is an open-source platform for preserving, organizing, and verifying evidence from public events.",
-  stats: [
-    {
-      label: "Active Events",
-      value: 1247,
-    },
-    {
-      label: "Evidence Items",
-      value: 48392,
-      suffix: "+",
-    },
-    {
-      label: "Global Contributors",
-      value: 15234,
-    },
-  ],
+  backgroundImage: "/images/hero-bg.png",
+  tags: ["Open Source", "Community Driven", "For Truth"],
+  tagline: "Document. Preserve. Organize. Verify.",
+  missionStatement: "Truth deserves structure.",
+  description:
+    "OpenWitness is an open-source platform for preserving, organizing, and verifying evidence from public events.",
+  stats: [],
   primaryCTA: {
-    label: "Get Started",
-    href: "#get-started",
+    label: "Explore Events",
+    href: "#events",
   },
   secondaryCTA: {
-    label: "Learn More",
-    href: "#learn-more",
+    label: "Report Incident",
+    href: "mailto:report@openwitness.org?subject=Incident%20Report",
   },
 };

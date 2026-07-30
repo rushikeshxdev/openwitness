@@ -115,3 +115,24 @@ body {
   transform: translateZ(0);
   backface-visibility: hidden;
 }
+
+/* Hide scrollbars on horizontal carousels while keeping scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Skip-link helper (Tailwind sr-only focus override) */
+.focus\:not-sr-only:focus {
+  position: fixed;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}

@@ -35,6 +35,8 @@ interface SectionTitleProps {
   className?: string;
   /** Enable gradient text effect on title */
   gradientText?: boolean;
+  /** Optional id for the heading element */
+  id?: string;
 }
 
 const alignmentClasses = {
@@ -49,6 +51,7 @@ export function SectionTitle({
   alignment = "left",
   className,
   gradientText = false,
+  id,
 }: SectionTitleProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -62,6 +65,7 @@ export function SectionTitle({
       variants={fadeIn}
     >
       <h2
+        id={id}
         className={cn(
           "text-section",
           gradientText &&
@@ -70,9 +74,9 @@ export function SectionTitle({
       >
         {title}
       </h2>
-      {subtitle && (
+      {subtitle ? (
         <p className="mt-3 text-body text-gray-400">{subtitle}</p>
-      )}
+      ) : null}
     </motion.div>
   );
 }

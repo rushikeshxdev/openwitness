@@ -1,23 +1,25 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { Organizations } from "./organizations";
 import { OrganizationCard } from "./organization-card";
 
-// Mock framer-motion to avoid animation-related test issues
-jest.mock("framer-motion", () => ({
-  ...jest.requireActual("framer-motion"),
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    section: ({ children, ...props }: any) => <section {...props}>{children}</section>,
-  },
-  useInView: () => true,
-}));
+vi.mock("framer-motion", async () => {
+  const actual = await vi.importActual("framer-motion");
+  return {
+    ...actual,
+    motion: {
+      div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+      section: ({ children, ...props }: any) => <section {...props}>{children}</section>,
+    },
+    useInView: () => true,
+  };
+});
 
-// Mock next/image
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: any) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -143,7 +145,7 @@ describe("Organizations", () => {
     const grid = container.querySelector(".grid");
     expect(grid).toHaveClass("grid-cols-2");
     expect(grid).toHaveClass("md:grid-cols-3");
-    expect(grid).toHaveClass("lg:grid-cols-4");
+    expect(grid).toHaveClass("lg:grid-cols-6");
   });
 
   it("has proper section accessibility", () => {

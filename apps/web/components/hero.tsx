@@ -1,202 +1,208 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, MotionConfig } from "framer-motion";
 import Image from "next/image";
-import { Container } from "./container";
 import { Button } from "./button";
 import { Stats, type Stat } from "./stats";
 import { fadeUp, staggerContainer } from "@/lib/animations";
-import { useRef } from "react";
-import { SpotlightCursor } from "./spotlight-cursor";
-
-/**
- * Hero component - Full-viewport section with cinematic background, mission statement, and animated stats
- * 
- * **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 12.2, 14.5**
- * 
- * Features:
- * - Full viewport height (h-screen) with flexbox centering
- * - Background image with dark overlay for text contrast
- * - Mission statement with fade-up reveal animation
- * - Primary and secondary CTA buttons with staggered animation
- * - Animated statistics cards
- * - Parallax effect on background
- * 
- * @example
- * ```tsx
- * <Hero
- *   backgroundImage="/images/hero-bg.jpg"
- *   missionStatement="Truth deserves structure"
- *   stats={[
- *     { label: "Active Events", value: 1247 },
- *     { label: "Evidence Items", value: 48392, suffix: "+" },
- *     { label: "Global Contributors", value: 15234 }
- *   ]}
- *   primaryCTA={{ label: "Get Started", onClick: () => {} }}
- *   secondaryCTA={{ label: "Learn More", onClick: () => {} }}
- * />
- * ```
- */
+import { useRef, useState } from "react";
+import { Compass, ShieldPlus, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface CTAButton {
   label: string;
   onClick?: () => void;
   href?: string;
+  icon?: LucideIcon;
 }
 
 export interface HeroProps {
   backgroundImage: string;
+  /** Combined into one pill: "Open Source • Community Driven • For Truth" */
+  tags?: string[];
   tagline?: string;
   missionStatement: string;
   description?: string;
-  stats: Stat[];
+  stats?: Stat[];
   primaryCTA: CTAButton;
   secondaryCTA: CTAButton;
+  alignment?: "left" | "center";
 }
 
+/**
+ * Hero — left-aligned copy matching referral typography & spacing
+ */
 export function Hero({
   backgroundImage,
+  tags = ["Open Source", "Community Driven", "For Truth"],
   tagline,
   missionStatement,
   description,
-  stats,
+  stats = [],
   primaryCTA,
   secondaryCTA,
+  alignment = "left",
 }: HeroProps) {
   const heroRef = useRef<HTMLElement>(null);
+  const [imageFailed, setImageFailed] = useState(false);
 
-  // Parallax effect: background moves slower than scroll
   const { scrollY } = useScroll();
-  const backgroundY = useTransform(scrollY, [0, 1000], [0, 300]);
+  const backgroundY = useTransform(scrollY, [0, 1000], [0, 140]);
 
-  // Handle CTA clicks
-  const handlePrimaryCTA = () => {
-    if (primaryCTA.onClick) {
-      primaryCTA.onClick();
-    } else if (primaryCTA.href) {
-      window.location.href = primaryCTA.href;
-    }
-  };
+  const hasTrailingPeriod = missionStatement.trim().endsWith(".");
+  const missionText = hasTrailingPeriod
+    ? missionStatement.trim().slice(0, -1)
+    : missionStatement;
 
-  const handleSecondaryCTA = () => {
-    if (secondaryCTA.onClick) {
-      secondaryCTA.onClick();
-    } else if (secondaryCTA.href) {
-      // Smooth scroll to section if href is an anchor
-      if (secondaryCTA.href.startsWith("#")) {
-        const element = document.querySelector(secondaryCTA.href);
-        element?.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.location.href = secondaryCTA.href;
-      }
-    }
-  };
+  const tagLabel = tags.join(" • ");
+  const PrimaryIcon = primaryCTA.icon ?? Compass;
+  const SecondaryIcon = secondaryCTA.icon ?? ShieldPlus;
 
   return (
-    <section
-      ref={heroRef}
-      className="relative h-screen w-full overflow-hidden flex items-center justify-center"
-    >
-      {/* Spotlight effect */}
-      <SpotlightCursor size={600} opacity={0.2} />
-
-      {/* Background image with parallax */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{ y: backgroundY }}
+    <MotionConfig reducedMotion="user">
+      <section
+        ref={heroRef}
+        className="relative min-h-[100svh] w-full overflow-hidden flex items-start md:items-center"
+        aria-labelledby="hero-heading"
       >
-        {/* Gradient fallback */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background-primary via-blue-950/20 to-background-elevated" />
-        
-        {/* Background image */}
-        <div className="relative w-full h-[120vh]">
-          <Image
-            src={backgroundImage}
-            alt="Hero background"
-            fill
-            priority
-            quality={90}
-            className="object-cover brightness-40"
-            sizes="100vw"
-            onError={(e) => {
-              // Hide image on error, gradient fallback will show
-              e.currentTarget.style.display = "none";
-            }}
-          />
-        </div>
-      </motion.div>
-
-      {/* Dark overlay for additional contrast */}
-      <div className="absolute inset-0 bg-black/30 z-10" />
-
-      {/* Content */}
-      <Container size="xl" className="relative z-20">
-        <motion.div
-          variants={staggerContainer}
-          initial="initial"
-          animate="animate"
-          className="flex flex-col items-center justify-center text-center"
-        >
-          {/* Tagline */}
-          {tagline && (
-            <motion.div
-              variants={fadeUp}
-              className="text-sm md:text-base text-text-secondary mb-6 tracking-wide"
-            >
-              {tagline}
-            </motion.div>
-          )}
-
-          {/* Mission Statement */}
-          <motion.h1
-            variants={fadeUp}
-            className="text-hero font-bold text-text-primary mb-6 max-w-5xl"
-          >
-            {missionStatement}
-          </motion.h1>
-
-          {/* Description */}
-          {description && (
-            <motion.p
-              variants={fadeUp}
-              className="text-base md:text-lg text-text-secondary mb-8 max-w-3xl"
-            >
-              {description}
-            </motion.p>
-          )}
-
-          {/* CTA Buttons */}
-          <motion.div
-            variants={fadeUp}
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
-            style={{ marginBottom: stats.length > 0 ? undefined : 0 }}
-          >
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handlePrimaryCTA}
-              className="w-full sm:w-auto"
-            >
-              {primaryCTA.label}
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={handleSecondaryCTA}
-              className="w-full sm:w-auto"
-            >
-              {secondaryCTA.label}
-            </Button>
-          </motion.div>
-
-          {/* Stats - only show if stats array is not empty */}
-          {stats.length > 0 && (
-            <motion.div variants={fadeUp} className="w-full mt-12 sm:mt-16">
-              <Stats stats={stats} />
-            </motion.div>
+        <motion.div className="absolute inset-0 z-0" style={{ y: backgroundY }}>
+          <div className="absolute inset-0 bg-[#0B0E11]" />
+          {!imageFailed && (
+            <div className="relative w-full h-[115%]">
+              <Image
+                src={backgroundImage}
+                alt="Public demonstration with citizens documenting the event"
+                fill
+                priority
+                quality={80}
+                className="object-cover object-[62%_35%] sm:object-[58%_32%] brightness-[0.82] contrast-[1.05]"
+                sizes="100vw"
+                onError={() => setImageFailed(true)}
+              />
+            </div>
           )}
         </motion.div>
-      </Container>
-    </section>
+
+        {/* Subtle left wash — readable copy, photo still clear */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-[#0B0E11]/70 from-0% via-[#0B0E11]/35 via-30% to-transparent to-58%"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#0B0E11] via-transparent to-black/25"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 h-40 pointer-events-none bg-gradient-to-t from-[#0B0E11] to-transparent"
+          aria-hidden="true"
+        />
+
+        {/* Copy nudged further left */}
+        <div className="relative z-20 w-full max-w-[1440px] mx-auto pl-2 sm:pl-3 md:pl-4 lg:pl-5 pr-6 pt-28 md:pt-32 pb-40 md:pb-48">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className={cn(
+              "flex flex-col w-full max-w-[540px] lg:max-w-[560px]",
+              alignment === "center" && "items-center text-center mx-auto",
+              alignment === "left" && "items-start text-left"
+            )}
+          >
+            {/* Single combined pill — referral mockup */}
+            {tags.length > 0 && (
+              <motion.div variants={fadeUp} className="mb-5 md:mb-6">
+                <span className="inline-flex items-center rounded-full border border-white/15 bg-black/45 px-3.5 py-1.5 text-[11px] md:text-xs font-medium tracking-wide text-zinc-300 backdrop-blur-md">
+                  {tagLabel}
+                </span>
+              </motion.div>
+            )}
+
+            {/* Headline — large, tight, white + blue period */}
+            <motion.h1
+              id="hero-heading"
+              variants={fadeUp}
+              className="font-bold text-white tracking-[-0.03em] leading-[1.05] mb-4 md:mb-5"
+              style={{
+                fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
+              }}
+            >
+              {missionText}
+              <span className="text-[#3B82F6]" aria-hidden="true">
+                .
+              </span>
+            </motion.h1>
+
+            {/* Tagline */}
+            {tagline && (
+              <motion.p
+                variants={fadeUp}
+                className="text-[15px] md:text-lg lg:text-xl font-medium text-white/90 mb-3 md:mb-4 tracking-[-0.01em]"
+              >
+                {tagline}
+              </motion.p>
+            )}
+
+            {/* Description */}
+            {description && (
+              <motion.p
+                variants={fadeUp}
+                className="text-[13px] md:text-[15px] text-zinc-400 mb-7 md:mb-8 max-w-[28rem] leading-[1.65]"
+              >
+                {description}
+              </motion.p>
+            )}
+
+            {/* CTAs — shiny glass borders */}
+            <motion.div
+              variants={fadeUp}
+              className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full sm:w-auto"
+            >
+              <Button
+                variant="primary"
+                size="md"
+                icon={PrimaryIcon}
+                iconPosition="left"
+                href={primaryCTA.href}
+                onClick={primaryCTA.onClick}
+                className={cn(
+                  "w-full sm:w-auto !rounded-xl !px-5 !py-2.5 text-sm",
+                  "!bg-gradient-to-b from-[#4B8BFF] to-[#2563EB]",
+                  "shadow-[0_8px_24px_rgba(37,99,235,0.4),inset_0_1px_0_rgba(255,255,255,0.35)]",
+                  "ring-1 ring-white/25 hover:ring-white/40",
+                  "border border-white/30"
+                )}
+              >
+                {primaryCTA.label}
+              </Button>
+              <Button
+                variant="ghost"
+                size="md"
+                icon={SecondaryIcon}
+                iconPosition="left"
+                href={secondaryCTA.href}
+                onClick={secondaryCTA.onClick}
+                className={cn(
+                  "w-full sm:w-auto !rounded-xl !px-5 !py-2.5 text-sm",
+                  "!bg-black/25 backdrop-blur-md",
+                  "!border !border-transparent",
+                  "[background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35))_padding-box,linear-gradient(135deg,rgba(255,255,255,0.55),rgba(255,255,255,0.12)_40%,rgba(59,130,246,0.45))_border-box]",
+                  "shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]",
+                  "hover:!bg-black/40"
+                )}
+              >
+                {secondaryCTA.label}
+              </Button>
+            </motion.div>
+
+            {stats.length > 0 && (
+              <motion.div variants={fadeUp} className="w-full mt-12">
+                <Stats stats={stats} />
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+      </section>
+    </MotionConfig>
   );
 }

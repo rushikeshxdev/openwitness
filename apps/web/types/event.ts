@@ -20,6 +20,8 @@ export interface Event {
   verificationStatus: "verified" | "pending" | "unverified";
   timestamp: Date;
   isActive: boolean;
+  /** Optional status badge shown on event cards */
+  badge?: "live" | "trending";
 }
 
 export interface EvidenceItem {
