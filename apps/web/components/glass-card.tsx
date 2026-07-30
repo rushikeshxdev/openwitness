@@ -40,7 +40,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
             ? (e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  onClick();
+                  onClick(e as unknown as React.MouseEvent<HTMLDivElement>);
                 }
               }
             : undefined

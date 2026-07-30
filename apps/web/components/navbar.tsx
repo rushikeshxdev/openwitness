@@ -85,14 +85,10 @@ export function Navbar({
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    document.querySelector("#events")?.scrollIntoView({ behavior: "smooth" });
-    if (q) {
-      window.history.replaceState(
-        null,
-        "",
-        `#events?q=${encodeURIComponent(q)}`
-      );
-    }
+    const href = q
+      ? `/events?q=${encodeURIComponent(q)}`
+      : "/events";
+    window.location.href = href;
     setIsMobileMenuOpen(false);
   };
 

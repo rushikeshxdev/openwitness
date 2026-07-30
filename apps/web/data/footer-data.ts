@@ -5,7 +5,7 @@ export const footerLinkColumns: FooterLinkColumn[] = [
   {
     title: "Product",
     links: [
-      { label: "Explore Events", href: "#events" },
+      { label: "Explore Events", href: "/events" },
       { label: "Live Map", href: "#map" },
       {
         label: "Report Incident",

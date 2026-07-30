@@ -1,7 +1,26 @@
 /**
  * Event-related TypeScript interfaces
- * Defines the data models for events, evidence items, and related entities
  */
+
+export type EventCategory =
+  | "protest"
+  | "disaster"
+  | "accident"
+  | "gathering"
+  | "other";
+
+export type ExploreStatus =
+  | "live"
+  | "trending"
+  | "verified"
+  | "under_review";
+
+export type EventRegion =
+  | "asia"
+  | "europe"
+  | "americas"
+  | "africa"
+  | "oceania";
 
 export interface Event {
   id: string;
@@ -20,8 +39,16 @@ export interface Event {
   verificationStatus: "verified" | "pending" | "unverified";
   timestamp: Date;
   isActive: boolean;
-  /** Optional status badge shown on event cards */
+  /** Optional status badge shown on landing event cards */
   badge?: "live" | "trending";
+  /** Explore page fields */
+  category?: EventCategory;
+  status?: ExploreStatus;
+  tags?: string[];
+  startedAt?: Date;
+  verifiedCount?: number;
+  contributorCount?: number;
+  region?: EventRegion;
 }
 
 export interface EvidenceItem {

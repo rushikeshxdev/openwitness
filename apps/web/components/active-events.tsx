@@ -33,7 +33,7 @@ export function ActiveEvents({
   title = "Active Events",
   subtitle = "Real-time updates from public events around the world",
   embedded = false,
-  viewAllHref = "#events",
+  viewAllHref = "/events",
   className,
 }: ActiveEventsProps) {
   const ref = useRef<HTMLDivElement>(null);

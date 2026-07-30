@@ -34,7 +34,7 @@ export const heroData: HeroData = {
   stats: [],
   primaryCTA: {
     label: "Explore Events",
-    href: "#events",
+    href: "/events",
   },
   secondaryCTA: {
     label: "Report Incident",
