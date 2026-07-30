@@ -14,6 +14,7 @@ import {
 import type { EventDetailViewModel } from "@/data/event-detail-data";
 import { formatStat } from "@/data/event-detail-data";
 import { EventDetailOverview } from "./event-detail-overview";
+import { useRouter } from "next/navigation";
 
 export type EventDetailTab =
   | "overview"
@@ -38,14 +39,22 @@ export interface EventDetailViewProps {
 }
 
 export function EventDetailView({ detail }: EventDetailViewProps) {
+  const router = useRouter();
   const [tab, setTab] = useState<EventDetailTab>("overview");
   const [following, setFollowing] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const badge = STATUS_BADGE[detail.status];
 
-  const openTab = useCallback((next: EventDetailTab) => {
-    setTab(next);
-  }, []);
+  const openTab = useCallback(
+    (next: EventDetailTab) => {
+      if (next === "timeline") {
+        router.push(`/events/${detail.id}/timeline`);
+        return;
+      }
+      setTab(next);
+    },
+    [detail.id, router]
+  );
 
   const tabs: { id: EventDetailTab; label: string }[] = [
     { id: "overview", label: "Overview" },
@@ -223,7 +232,7 @@ export function EventDetailView({ detail }: EventDetailViewProps) {
                   type="button"
                   role="tab"
                   aria-selected={active}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => openTab(t.id)}
                   className={cn(
                     "relative shrink-0 px-3.5 sm:px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap",
                     active ? "text-white" : "text-zinc-400 hover:text-zinc-200"

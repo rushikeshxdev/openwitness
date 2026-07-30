@@ -1,0 +1,64 @@
+import { notFound } from "next/navigation";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { EventDetailTimelineView } from "@/components/event-detail/event-detail-timeline-view";
+import { buildEventTimeline } from "@/data/event-timeline-data";
+import { getAllEventDetailIds } from "@/data/event-detail-data";
+import {
+  footerLinkColumns,
+  footerSocialLinks,
+  footerCopyright,
+} from "@/data/footer-data";
+import type { Metadata } from "next";
+
+export function generateStaticParams() {
+  return getAllEventDetailIds().map((id) => ({ id }));
+}
+
+const navLinks = [
+  { label: "Explore", href: "/events" },
+  { label: "Map", href: "/map" },
+  { label: "Organizations", href: "/#organizations" },
+  { label: "About", href: "/#about" },
+] as const;
+
+type Props = { params: Promise<{ id: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const model = buildEventTimeline(id);
+  if (!model) return { title: "Timeline not found – OpenWitness" };
+  return {
+    title: `${model.overview.title} Timeline – OpenWitness`,
+    description: `Complete chronological timeline for ${model.overview.title} with verified evidence and updates.`,
+  };
+}
+
+export default async function EventTimelinePage({ params }: Props) {
+  const { id } = await params;
+  const model = buildEventTimeline(id);
+  if (!model) notFound();
+
+  return (
+    <div className="min-h-screen bg-[#0B0E11] text-text-primary">
+      <Navbar
+        links={[...navLinks]}
+        ctaButton={{
+          label: "Report Incident",
+          href: "mailto:report@openwitness.org?subject=Incident%20Report",
+        }}
+        showSearch
+      />
+
+      <main>
+        <EventDetailTimelineView model={model} />
+      </main>
+
+      <Footer
+        linkColumns={footerLinkColumns}
+        socialLinks={footerSocialLinks}
+        copyright={footerCopyright}
+      />
+    </div>
+  );
+}
