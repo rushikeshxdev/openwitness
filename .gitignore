@@ -141,3 +141,23 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Dependency locks in subdirectories (use root lock file)
+apps/*/package-lock.json
+apps/*/pnpm-lock.yaml
+apps/*/yarn.lock
+
+# Workspace config duplicates
+apps/*/pnpm-workspace.yaml
+
+# Build outputs
+apps/*/.next/
+apps/*/out/
+apps/*/build/
+apps/*/dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
