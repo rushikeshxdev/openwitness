@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { FooterNavLink } from "./footer-nav-link";
 
 /**
  * Footer — static server component with design-system tokens
@@ -83,16 +84,7 @@ export function Footer({
               <ul className="mt-6 space-y-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className={cn(
-                        "text-base text-text-secondary transition-colors duration-200",
-                        "hover:text-text-primary hover:underline",
-                        "focus:outline-none focus:text-text-primary"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
+                    <FooterNavLink label={link.label} href={link.href} />
                   </li>
                 ))}
               </ul>

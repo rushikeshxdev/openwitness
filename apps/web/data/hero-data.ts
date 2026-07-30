@@ -38,6 +38,6 @@ export const heroData: HeroData = {
   },
   secondaryCTA: {
     label: "Report Incident",
-    href: "mailto:report@openwitness.org?subject=Incident%20Report",
+    href: "/report",
   },
 };

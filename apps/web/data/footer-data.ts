@@ -7,9 +7,10 @@ export const footerLinkColumns: FooterLinkColumn[] = [
     links: [
       { label: "Explore Events", href: "/events" },
       { label: "Live Map", href: "/map" },
+      { label: "Sign In", href: "/login" },
       {
         label: "Report Incident",
-        href: "mailto:report@openwitness.org?subject=Incident%20Report",
+        href: "/report",
       },
     ],
   },

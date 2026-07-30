@@ -6,6 +6,7 @@ import { Menu, X, Search, ClipboardCheck, Eye } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "./button";
 import { duration } from "@/lib/animations";
+import { ReportIncidentGate } from "@/components/auth/report-incident-gate";
 
 export interface NavbarLink {
   label: string;
@@ -207,29 +208,35 @@ export function Navbar({
                 </form>
               )}
 
-              {ctaButton && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  icon={ClipboardCheck}
-                  iconPosition="left"
-                  href={ctaButton.href}
-                  onClick={
-                    ctaButton.onClick
-                      ? () => ctaButton.onClick?.()
-                      : undefined
-                  }
-                  className={cn(
-                    "whitespace-nowrap shrink-0",
-                    "!rounded-xl !h-9 !px-3.5 lg:!px-4",
-                    "!bg-[#3B82F6] hover:!bg-[#2563EB]",
-                    "!text-[12px] lg:!text-[13px] !font-semibold",
-                    "shadow-md shadow-blue-500/25"
-                  )}
-                >
-                  {ctaButton.label}
-                </Button>
-              )}
+              {ctaButton &&
+                (ctaButton.href === "/report" ? (
+                  <ReportIncidentGate
+                    label={ctaButton.label}
+                    variant="navbar"
+                  />
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon={ClipboardCheck}
+                    iconPosition="left"
+                    href={ctaButton.href}
+                    onClick={
+                      ctaButton.onClick
+                        ? () => ctaButton.onClick?.()
+                        : undefined
+                    }
+                    className={cn(
+                      "whitespace-nowrap shrink-0",
+                      "!rounded-xl !h-9 !px-3.5 lg:!px-4",
+                      "!bg-[#3B82F6] hover:!bg-[#2563EB]",
+                      "!text-[12px] lg:!text-[13px] !font-semibold",
+                      "shadow-md shadow-blue-500/25"
+                    )}
+                  >
+                    {ctaButton.label}
+                  </Button>
+                ))}
             </div>
 
             {/* Mobile toggle */}
@@ -311,20 +318,29 @@ export function Navbar({
             </nav>
             {ctaButton && (
               <div className="pt-6 border-t border-white/10">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  icon={ClipboardCheck}
-                  iconPosition="left"
-                  href={ctaButton.href}
-                  onClick={() => {
-                    ctaButton.onClick?.();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full !rounded-xl !bg-[#3B82F6]"
-                >
-                  {ctaButton.label}
-                </Button>
+                {ctaButton.href === "/report" ? (
+                  <ReportIncidentGate
+                    label={ctaButton.label}
+                    variant="navbar"
+                    className="!h-11 !w-full !rounded-xl"
+                    onAfterNavigate={() => setIsMobileMenuOpen(false)}
+                  />
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    icon={ClipboardCheck}
+                    iconPosition="left"
+                    href={ctaButton.href}
+                    onClick={() => {
+                      ctaButton.onClick?.();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full !rounded-xl !bg-[#3B82F6]"
+                  >
+                    {ctaButton.label}
+                  </Button>
+                )}
               </div>
             )}
           </div>

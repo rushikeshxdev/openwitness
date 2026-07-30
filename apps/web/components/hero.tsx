@@ -8,6 +8,7 @@ import { fadeUp, staggerContainer } from "@/lib/animations";
 import { useRef, useState } from "react";
 import { Compass, ShieldPlus, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ReportIncidentGate } from "@/components/auth/report-incident-gate";
 
 export interface CTAButton {
   label: string;
@@ -175,24 +176,38 @@ export function Hero({
               >
                 {primaryCTA.label}
               </Button>
-              <Button
-                variant="ghost"
-                size="lg"
-                icon={SecondaryIcon}
-                iconPosition="left"
-                href={secondaryCTA.href}
-                onClick={secondaryCTA.onClick}
-                className={cn(
-                  "w-full sm:w-auto !rounded-xl !px-8 !py-4 text-lg",
-                  "!bg-black/25 backdrop-blur-md",
-                  "!border !border-transparent",
-                  "[background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35))_padding-box,linear-gradient(135deg,rgba(255,255,255,0.55),rgba(255,255,255,0.12)_40%,rgba(59,130,246,0.45))_border-box]",
-                  "shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]",
-                  "hover:!bg-black/40"
-                )}
-              >
-                {secondaryCTA.label}
-              </Button>
+              {secondaryCTA.href === "/report" ? (
+                <ReportIncidentGate
+                  label={secondaryCTA.label}
+                  variant="hero"
+                  className={cn(
+                    "!bg-black/25 backdrop-blur-md",
+                    "!border !border-transparent",
+                    "[background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35))_padding-box,linear-gradient(135deg,rgba(255,255,255,0.55),rgba(255,255,255,0.12)_40%,rgba(59,130,246,0.45))_border-box]",
+                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]",
+                    "hover:!bg-black/40"
+                  )}
+                />
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  icon={SecondaryIcon}
+                  iconPosition="left"
+                  href={secondaryCTA.href}
+                  onClick={secondaryCTA.onClick}
+                  className={cn(
+                    "w-full sm:w-auto !rounded-xl !px-8 !py-4 text-lg",
+                    "!bg-black/25 backdrop-blur-md",
+                    "!border !border-transparent",
+                    "[background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35))_padding-box,linear-gradient(135deg,rgba(255,255,255,0.55),rgba(255,255,255,0.12)_40%,rgba(59,130,246,0.45))_border-box]",
+                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]",
+                    "hover:!bg-black/40"
+                  )}
+                >
+                  {secondaryCTA.label}
+                </Button>
+              )}
             </motion.div>
 
             {stats.length > 0 && (

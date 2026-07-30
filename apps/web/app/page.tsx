@@ -75,7 +75,7 @@ export default function HomePage() {
         links={[...navLinks]}
         ctaButton={{
           label: "Report Incident",
-          href: "mailto:report@openwitness.org?subject=Incident%20Report",
+          href: "/report",
         }}
         showSearch
       />
