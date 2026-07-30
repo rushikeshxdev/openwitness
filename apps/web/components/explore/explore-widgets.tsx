@@ -55,7 +55,7 @@ export function LiveEventMapWidget({
   activeEvents,
   cities,
   countries,
-  href = "/#map",
+  href = "/map",
   className,
 }: LiveEventMapWidgetProps) {
   return (
