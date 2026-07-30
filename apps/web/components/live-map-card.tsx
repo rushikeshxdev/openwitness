@@ -1,10 +1,12 @@
+"use client";
+
 import { GlassCard } from "./glass-card";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 /**
- * Live Map Card — static preview linking to the full map section.
- * Dot grid is module-scoped so it is built once, not per render.
+ * Live Map Card — text left, dotted world map right (mockup)
  */
 
 export interface LiveMapCardProps {
@@ -13,30 +15,33 @@ export interface LiveMapCardProps {
 }
 
 const HOTSPOTS = [
-  { cx: 72, cy: 38, r: 3.5 },
-  { cx: 48, cy: 32, r: 2.8 },
-  { cx: 22, cy: 42, r: 2.5 },
-  { cx: 78, cy: 55, r: 2.2 },
-  { cx: 52, cy: 58, r: 2.0 },
+  { cx: 22, cy: 34, r: 2.6 },
+  { cx: 28, cy: 52, r: 2.0 },
+  { cx: 48, cy: 28, r: 2.4 },
+  { cx: 52, cy: 48, r: 1.9 },
+  { cx: 72, cy: 34, r: 2.8 },
+  { cx: 80, cy: 42, r: 2.1 },
 ] as const;
 
 function buildWorldDots(): ReadonlyArray<{ x: number; y: number }> {
   const dots: Array<{ x: number; y: number }> = [];
-  for (let y = 12; y <= 78; y += 4) {
-    for (let x = 8; x <= 92; x += 4) {
+  for (let y = 8; y <= 78; y += 3.2) {
+    for (let x = 4; x <= 96; x += 3.2) {
       const inAmericas =
-        x >= 12 &&
-        x <= 32 &&
-        y >= 18 &&
+        x >= 8 &&
+        x <= 36 &&
+        y >= 14 &&
         y <= 70 &&
-        Math.sin((y - 20) * 0.08) * 6 + 22 > x - 8;
-      const inEuropeAfrica = x >= 42 && x <= 58 && y >= 18 && y <= 68;
-      const inAsia = x >= 58 && x <= 88 && y >= 18 && y <= 58 && (x < 82 || y < 48);
-      const inOceania = x >= 78 && x <= 90 && y >= 58 && y <= 72;
+        Math.sin((y - 16) * 0.09) * 5 + 18 > x - 10;
+      const inEuropeAfrica =
+        x >= 40 && x <= 58 && y >= 14 && y <= 68 && !(x > 54 && y < 22);
+      const inAsia =
+        x >= 58 && x <= 92 && y >= 14 && y <= 54 && (x < 86 || y < 44);
+      const inOceania = x >= 78 && x <= 94 && y >= 56 && y <= 74;
 
       if (
         (inAmericas || inEuropeAfrica || inAsia || inOceania) &&
-        (x * 7 + y * 13) % 3 !== 0
+        Math.round(x * 7 + y * 13) % 3 !== 0
       ) {
         dots.push({ x, y });
       }
@@ -56,21 +61,22 @@ function MiniWorldMap() {
       preserveAspectRatio="xMidYMid meet"
     >
       {WORLD_DOTS.map((d, i) => (
-        <circle key={i} cx={d.x} cy={d.y} r={0.7} className="fill-white/25" />
+        <circle key={i} cx={d.x} cy={d.y} r={0.5} className="fill-white/25" />
       ))}
       {HOTSPOTS.map((h, i) => (
         <g key={i}>
           <circle
             cx={h.cx}
             cy={h.cy}
-            r={h.r * 2.2}
-            className="fill-brand-blue-primary/20 motion-safe:animate-pulse"
+            r={h.r * 2.6}
+            className="fill-[#3B82F6]/20 motion-safe:animate-pulse"
           />
           <circle
             cx={h.cx}
             cy={h.cy}
             r={h.r}
-            className="fill-brand-blue-primary"
+            className="fill-[#3B82F6]"
+            style={{ filter: "drop-shadow(0 0 5px rgba(59,130,246,0.95))" }}
           />
         </g>
       ))}
@@ -82,30 +88,37 @@ export function LiveMapCard({ href = "#map", className }: LiveMapCardProps) {
   return (
     <Link
       href={href}
-      className={className}
+      className={cn("block h-full min-h-[180px]", className)}
       aria-label="View live map of events around the world"
     >
       <GlassCard
         variant="hover-lift"
-        className="p-5 sm:p-6 h-full flex flex-col bg-black/40 hover:bg-white/10 cursor-pointer group overflow-hidden"
+        className={cn(
+          "h-full p-5 sm:p-6",
+          "bg-black/45 border-white/[0.12]",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
+          "flex flex-row items-center gap-4 sm:gap-5",
+          "cursor-pointer group overflow-hidden"
+        )}
       >
-        <div className="mb-3">
-          <h3 className="text-lg font-semibold text-text-primary mb-1">Live Map</h3>
-          <p className="text-text-secondary text-sm">
+        <div className="w-[42%] sm:w-[38%] shrink-0 flex flex-col justify-center pr-1">
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+            Live Map
+          </h3>
+          <p className="text-zinc-400 text-sm sm:text-base leading-snug mb-4">
             See events happening around the world
           </p>
+          <span className="inline-flex items-center text-[#3B82F6] text-base font-medium group-hover:text-sky-400 transition-colors">
+            View Map
+            <ArrowRight
+              className="ml-1.5 w-5 h-5 group-hover:translate-x-0.5 transition-transform"
+              aria-hidden="true"
+            />
+          </span>
         </div>
 
-        <div className="relative flex-1 min-h-[100px] my-2 rounded-lg overflow-hidden bg-gradient-to-b from-blue-950/40 to-transparent">
+        <div className="relative flex-1 self-stretch min-h-[136px] rounded-lg overflow-hidden">
           <MiniWorldMap />
-        </div>
-
-        <div className="mt-2 flex items-center text-brand-blue-primary group-hover:text-brand-cyan-accent transition-colors">
-          <span className="font-medium text-sm">View Map</span>
-          <ArrowRight
-            className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
-            aria-hidden="true"
-          />
         </div>
       </GlassCard>
     </Link>

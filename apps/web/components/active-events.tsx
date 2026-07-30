@@ -98,30 +98,30 @@ export function ActiveEvents({
   const carousel = (
     <div className="relative" ref={ref}>
       {showScrollIndicators && canScrollLeft && (
-        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background-primary to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0B0E11] to-transparent z-10 pointer-events-none" />
       )}
 
       {showScrollIndicators && canScrollRight && (
-        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background-primary to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0B0E11] to-transparent z-10 pointer-events-none" />
       )}
 
       {showScrollIndicators && canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
+          className="hidden md:flex absolute left-1.5 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="w-5 h-5 text-white" />
+          <ChevronLeft className="w-4 h-4 text-white" />
         </button>
       )}
 
       {showScrollIndicators && canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
+          className="hidden md:flex absolute right-1.5 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
           aria-label="Scroll right"
         >
-          <ChevronRight className="w-5 h-5 text-white" />
+          <ChevronRight className="w-4 h-4 text-white" />
         </button>
       )}
 
@@ -130,7 +130,7 @@ export function ActiveEvents({
         variants={staggerContainer}
         initial="initial"
         animate={isInView ? "animate" : "initial"}
-        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+        className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-1"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -138,14 +138,14 @@ export function ActiveEvents({
       >
         {events.map((event, index) => (
           <motion.div key={event.id} variants={fadeUp} custom={index}>
-            <EventCard event={event} onClick={onEventClick} enableTilt={false} />
+            <EventCard event={event} onClick={onEventClick} />
           </motion.div>
         ))}
       </motion.div>
 
       {showScrollIndicators && (
-        <div className="md:hidden mt-4 text-center">
-          <p className="text-sm text-text-tertiary">Swipe to explore more events</p>
+        <div className="md:hidden mt-3 text-center">
+          <p className="text-xs text-text-tertiary">Swipe to explore more events</p>
         </div>
       )}
     </div>
@@ -154,19 +154,23 @@ export function ActiveEvents({
   if (embedded) {
     return (
       <div id="events" className={cn(className)}>
-        <div className="flex items-start justify-between gap-4 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-6 md:mb-7">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">{title}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">
+              {title}
+            </h2>
             {subtitle && (
-              <p className="mt-1 text-sm md:text-base text-text-secondary">{subtitle}</p>
+              <p className="mt-1.5 text-base text-text-secondary/90">
+                {subtitle}
+              </p>
             )}
           </div>
           <a
             href={viewAllHref}
-            className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-brand-blue-primary hover:text-brand-cyan-accent transition-colors whitespace-nowrap mt-1"
+            className="hidden sm:inline-flex items-center gap-1.5 text-base font-medium text-[#60A5FA] hover:text-white transition-colors whitespace-nowrap mt-1"
           >
             View all events
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-5 h-5" />
           </a>
         </div>
         {carousel}

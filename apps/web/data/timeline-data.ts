@@ -1,5 +1,5 @@
 /**
- * Timeline data with typed activity metadata and fixed timestamps
+ * Timeline data matching the dashboard mockup
  */
 
 import { LANDING_REFERENCE_TIME } from "./events-data";
@@ -19,7 +19,7 @@ export interface TimelineEntryBase {
 export type TimelineEntry =
   | (TimelineEntryBase & {
       activityType: "evidence_added";
-      metadata: { evidenceCount: number };
+      metadata: { evidenceCount?: number; flagged?: boolean };
     })
   | (TimelineEntryBase & {
       activityType: "event_created";
@@ -53,35 +53,19 @@ export const timelineData: TimelineEntry[] = [
   {
     id: "tl-3",
     timestamp: minutesBefore(15),
-    eventName: "Farmers March – Punjab",
+    eventName: "Lucknow, Uttar Pradesh",
     activityType: "event_created",
-    summary: "New event created: Farmers March – Punjab",
+    summary: "New event trending in Lucknow, Uttar Pradesh",
     metadata: {},
   },
   {
     id: "tl-4",
     timestamp: minutesBefore(22),
-    eventName: "Student Sit-in – Mumbai",
+    eventName: "Hyderabad, Telangana",
     activityType: "evidence_added",
-    summary: "Photo evidence uploaded to Student Sit-in – Mumbai",
-    metadata: { evidenceCount: 4 },
-  },
-  {
-    id: "tl-5",
-    timestamp: minutesBefore(36),
-    eventName: "Hyderabad Assembly",
-    activityType: "verification_updated",
-    summary: "Evidence flagged in Hyderabad Assembly",
-    metadata: { verificationStatus: "pending" },
-  },
-  {
-    id: "tl-6",
-    timestamp: minutesBefore(48),
-    eventName: "Workers Rally – Chennai",
-    activityType: "evidence_added",
-    summary: "Video evidence added to Workers Rally – Chennai",
-    metadata: { evidenceCount: 7 },
+    summary: "Evidence flagged in Hyderabad, Telangana",
+    metadata: { flagged: true },
   },
 ];
 
-export const recentTimelineData = timelineData.slice(0, 5);
+export const recentTimelineData = timelineData;

@@ -97,34 +97,34 @@ export function Hero({
           aria-hidden="true"
         />
 
-        {/* Copy nudged further left */}
-        <div className="relative z-20 w-full max-w-[1440px] mx-auto pl-2 sm:pl-3 md:pl-4 lg:pl-5 pr-6 pt-28 md:pt-32 pb-40 md:pb-48">
+        {/* Copy further left + larger type */}
+        <div className="relative z-20 w-full max-w-[1440px] mx-auto pl-2 sm:pl-3 md:pl-4 lg:pl-5 pr-5 pt-28 md:pt-36 pb-44 md:pb-52">
           <motion.div
             variants={staggerContainer}
             initial="initial"
             animate="animate"
             className={cn(
-              "flex flex-col w-full max-w-[540px] lg:max-w-[560px]",
+              "flex flex-col w-full max-w-[720px] lg:max-w-[780px]",
               alignment === "center" && "items-center text-center mx-auto",
               alignment === "left" && "items-start text-left"
             )}
           >
-            {/* Single combined pill — referral mockup */}
+            {/* Single combined pill */}
             {tags.length > 0 && (
-              <motion.div variants={fadeUp} className="mb-5 md:mb-6">
-                <span className="inline-flex items-center rounded-full border border-white/15 bg-black/45 px-3.5 py-1.5 text-[11px] md:text-xs font-medium tracking-wide text-zinc-300 backdrop-blur-md">
+              <motion.div variants={fadeUp} className="mb-6 md:mb-8">
+                <span className="inline-flex items-center rounded-full border border-white/15 bg-black/45 px-5 py-2.5 text-sm md:text-base font-medium tracking-wide text-zinc-200 backdrop-blur-md">
                   {tagLabel}
                 </span>
               </motion.div>
             )}
 
-            {/* Headline — large, tight, white + blue period */}
+            {/* Headline */}
             <motion.h1
               id="hero-heading"
               variants={fadeUp}
-              className="font-bold text-white tracking-[-0.03em] leading-[1.05] mb-4 md:mb-5"
+              className="font-bold text-white tracking-[-0.04em] leading-[1.0] mb-6 md:mb-7"
               style={{
-                fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
+                fontSize: "clamp(3.5rem, 7.5vw, 6.25rem)",
               }}
             >
               {missionText}
@@ -137,7 +137,7 @@ export function Hero({
             {tagline && (
               <motion.p
                 variants={fadeUp}
-                className="text-[15px] md:text-lg lg:text-xl font-medium text-white/90 mb-3 md:mb-4 tracking-[-0.01em]"
+                className="text-xl md:text-2xl lg:text-3xl font-medium text-white/95 mb-5 md:mb-6 tracking-[-0.02em]"
               >
                 {tagline}
               </motion.p>
@@ -147,26 +147,26 @@ export function Hero({
             {description && (
               <motion.p
                 variants={fadeUp}
-                className="text-[13px] md:text-[15px] text-zinc-400 mb-7 md:mb-8 max-w-[28rem] leading-[1.65]"
+                className="text-lg md:text-xl text-zinc-300 mb-9 md:mb-11 max-w-[40rem] leading-[1.7]"
               >
                 {description}
               </motion.p>
             )}
 
-            {/* CTAs — shiny glass borders */}
+            {/* CTAs */}
             <motion.div
               variants={fadeUp}
-              className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full sm:w-auto"
+              className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 w-full sm:w-auto"
             >
               <Button
                 variant="primary"
-                size="md"
+                size="lg"
                 icon={PrimaryIcon}
                 iconPosition="left"
                 href={primaryCTA.href}
                 onClick={primaryCTA.onClick}
                 className={cn(
-                  "w-full sm:w-auto !rounded-xl !px-5 !py-2.5 text-sm",
+                  "w-full sm:w-auto !rounded-xl !px-8 !py-4 text-lg",
                   "!bg-gradient-to-b from-[#4B8BFF] to-[#2563EB]",
                   "shadow-[0_8px_24px_rgba(37,99,235,0.4),inset_0_1px_0_rgba(255,255,255,0.35)]",
                   "ring-1 ring-white/25 hover:ring-white/40",
@@ -177,13 +177,13 @@ export function Hero({
               </Button>
               <Button
                 variant="ghost"
-                size="md"
+                size="lg"
                 icon={SecondaryIcon}
                 iconPosition="left"
                 href={secondaryCTA.href}
                 onClick={secondaryCTA.onClick}
                 className={cn(
-                  "w-full sm:w-auto !rounded-xl !px-5 !py-2.5 text-sm",
+                  "w-full sm:w-auto !rounded-xl !px-8 !py-4 text-lg",
                   "!bg-black/25 backdrop-blur-md",
                   "!border !border-transparent",
                   "[background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35))_padding-box,linear-gradient(135deg,rgba(255,255,255,0.55),rgba(255,255,255,0.12)_40%,rgba(59,130,246,0.45))_border-box]",

@@ -10,9 +10,11 @@ vi.mock("framer-motion", async () => {
     ...actual,
     motion: {
       div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+      ol: ({ children, ...props }: any) => <ol {...props}>{children}</ol>,
+      li: ({ children, ...props }: any) => <li {...props}>{children}</li>,
     },
     useInView: () => true,
-    MotionConfig: ({ children }: any) => children,
+    MotionConfig: ({ children }: any) => <>{children}</>,
   };
 });
 
@@ -92,8 +94,11 @@ describe("Timeline Component", () => {
 
   it("renders connecting line", () => {
     const { container } = render(<Timeline entries={mockEntries} />);
-    expect(
-      container.querySelector(".bg-gradient-to-b")
-    ).toBeInTheDocument();
+    expect(container.querySelector(".w-px")).toBeInTheDocument();
+  });
+
+  it("renders as a single glass panel", () => {
+    const { container } = render(<Timeline entries={mockEntries} />);
+    expect(container.querySelector(".backdrop-blur-md")).toBeInTheDocument();
   });
 });

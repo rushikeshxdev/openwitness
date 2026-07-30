@@ -262,7 +262,7 @@ describe("Hero", () => {
 
     it("applies responsive spacing", () => {
       const { container } = render(<Hero {...mockHeroProps} />);
-      const content = container.querySelector(".mb-7");
+      const content = container.querySelector(".mb-8");
       expect(content).toBeInTheDocument();
     });
   });

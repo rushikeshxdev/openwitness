@@ -57,9 +57,8 @@ describe("Stats", () => {
 
     it("wraps each stat in a GlassCard", () => {
       const { container } = render(<Stats {...mockStats} />);
-      // GlassCards have the darker background with black/40
-      const glassCards = container.querySelectorAll(".bg-black\\/40");
-      
+      const glassCards = container.querySelectorAll(".backdrop-blur-md");
+
       expect(glassCards.length).toBe(3);
     });
   });
@@ -68,7 +67,7 @@ describe("Stats", () => {
     it("uses responsive grid layout", () => {
       const { container } = render(<Stats {...mockStats} />);
       const grid = container.querySelector(".grid");
-      
+
       expect(grid).toHaveClass("grid-cols-1");
       expect(grid).toHaveClass("sm:grid-cols-2");
       expect(grid).toHaveClass("lg:grid-cols-3");
@@ -77,39 +76,48 @@ describe("Stats", () => {
     it("applies gap between stat cards", () => {
       const { container } = render(<Stats {...mockStats} />);
       const grid = container.querySelector(".grid");
-      
+
       expect(grid).toHaveClass("gap-4");
       expect(grid).toHaveClass("sm:gap-6");
     });
 
     it("centers stat content", () => {
       const { container } = render(<Stats {...mockStats} />);
-      // Cards use flex column layout for icon + value + label
       const cards = container.querySelectorAll(".flex.flex-col");
       expect(cards.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it("renders cards as direct children when layout is contents", () => {
+      const { container } = render(
+        <div className="grid grid-cols-4">
+          <Stats {...mockStats} layout="contents" />
+        </div>
+      );
+      // Fragment flattens — cards become grid children (no wrapper .grid from Stats)
+      expect(container.querySelectorAll(".backdrop-blur-md").length).toBe(3);
     });
   });
 
   describe("Typography", () => {
     it("applies large font size to stat values", () => {
       const { container } = render(<Stats {...mockStats} />);
-      const statValues = container.querySelectorAll(".md\\:text-4xl");
-      
+      const statValues = container.querySelectorAll(".font-bold.tabular-nums");
+
       expect(statValues.length).toBe(3);
     });
 
     it("applies body text style to labels", () => {
-      const { container } = render(<Stats {...mockStats} />);
-      const labels = container.querySelectorAll(".md\\:text-base");
-      
-      expect(labels.length).toBe(3);
+      render(<Stats {...mockStats} />);
+      expect(screen.getByText("Active Events")).toBeInTheDocument();
+      expect(screen.getByText("Evidence Items")).toBeInTheDocument();
+      expect(screen.getByText("Global Contributors")).toBeInTheDocument();
     });
 
     it("applies correct text colors", () => {
       const { container } = render(<Stats {...mockStats} />);
-      const values = container.querySelectorAll(".text-text-primary");
-      const labels = container.querySelectorAll(".text-text-secondary");
-      
+      const values = container.querySelectorAll(".text-white");
+      const labels = container.querySelectorAll(".text-zinc-300");
+
       expect(values.length).toBeGreaterThanOrEqual(3);
       expect(labels.length).toBeGreaterThanOrEqual(3);
     });
@@ -118,9 +126,8 @@ describe("Stats", () => {
   describe("Animation", () => {
     it("initializes with animated number components", () => {
       const { container } = render(<Stats {...mockStats} />);
-      const statValues = container.querySelectorAll(".md\\:text-4xl");
-      
-      // Should render number containers for animation
+      const statValues = container.querySelectorAll(".tabular-nums");
+
       expect(statValues.length).toBe(3);
     });
 

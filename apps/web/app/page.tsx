@@ -96,28 +96,28 @@ export default function HomePage() {
           alignment="left"
         />
 
-        {/* 2. Stats row overlapping hero bottom */}
+        {/* 2. Stats + Live Map — 4 equal cards + wide map (mockup row) */}
         <section
-          className="relative z-20 -mt-28 md:-mt-32 pb-6 md:pb-10"
+          className="relative z-20 -mt-24 md:-mt-28 pb-8 md:pb-12"
           aria-label="Platform statistics"
         >
-          <div className="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-5 lg:px-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
-              <Stats stats={statsData} layout="contents" className="contents" />
-              <div className="col-span-2 lg:col-span-4 xl:col-span-2 min-h-[168px]">
-                <LiveMapCard href="#map" className="block h-full" />
+          <Container size="xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3.5 sm:gap-4 items-stretch">
+              <Stats stats={statsData} layout="contents" />
+              <div className="col-span-2 md:col-span-4 xl:col-span-2 min-h-[180px]">
+                <LiveMapCard href="#map" />
               </div>
             </div>
-          </div>
+          </Container>
         </section>
 
         {/* 3. Active Events (≈2/3) + Recent Timeline (≈1/3) */}
         <section
-          className="py-10 md:py-16"
+          className="py-10 md:py-14"
           aria-label="Active events and recent activity"
         >
           <Container size="xl">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-8 xl:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-7 xl:gap-10">
               <div className="lg:col-span-2 min-w-0">
                 <ActiveEvents
                   events={activeEventsData}
@@ -127,18 +127,16 @@ export default function HomePage() {
               </div>
 
               <div className="lg:col-span-1 min-w-0">
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-text-primary">
-                      Recent Timeline
-                    </h2>
-                  </div>
+                <div className="flex items-start justify-between gap-3 mb-6 md:mb-7">
+                  <h2 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">
+                    Recent Timeline
+                  </h2>
                   <a
                     href="#timeline"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue-primary hover:text-brand-cyan-accent transition-colors whitespace-nowrap mt-1.5"
+                    className="inline-flex items-center gap-1.5 text-base font-medium text-[#60A5FA] hover:text-white transition-colors whitespace-nowrap mt-1"
                   >
                     View all
-                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    <ArrowRight className="w-5 h-5" aria-hidden="true" />
                   </a>
                 </div>
                 <div id="timeline">
