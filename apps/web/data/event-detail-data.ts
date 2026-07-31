@@ -232,9 +232,9 @@ const OVERRIDES: Partial<
     ],
     evidenceHighlights: [
       {
-        id: "eh1",
-        title: "Protest at North Campus",
-        thumbnailUrl: "/images/events/event1.jpg",
+        id: "EVT-2024-0517-0001",
+        title: "Protest at India Gate",
+        thumbnailUrl: "/images/hero-bg.png",
         duration: "01:23",
         relativeLabel: "3m ago",
         verified: true,

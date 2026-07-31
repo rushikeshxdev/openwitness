@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "../glass-card";
@@ -450,51 +451,54 @@ export function EventDetailOverview({
             className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
           >
             {detail.evidenceHighlights.map((item) => (
-              <article
+              <Link
                 key={item.id}
+                href={`/events/${detail.id}/evidence/${item.id}`}
                 className="w-[200px] sm:w-[220px] shrink-0 rounded-xl border border-white/12 bg-[#121214]/90 overflow-hidden group"
               >
-                <div className="relative aspect-video">
-                  <Image
-                    src={item.thumbnailUrl}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="220px"
-                  />
-                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors" />
-                  <span className="absolute bottom-2 left-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white tabular-nums">
-                    {item.duration}
-                  </span>
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">
-                      <Play
-                        className="w-4 h-4 fill-current ml-0.5"
-                        aria-hidden="true"
-                      />
+                <article>
+                  <div className="relative aspect-video">
+                    <Image
+                      src={item.thumbnailUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="220px"
+                    />
+                    <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors" />
+                    <span className="absolute bottom-2 left-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white tabular-nums">
+                      {item.duration}
                     </span>
-                  </span>
-                </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-white line-clamp-1">
-                    {item.title}
-                  </h3>
-                  <div className="mt-1.5 flex items-center justify-between gap-2">
-                    <p className="text-[11px] text-zinc-500">
-                      Video • {item.relativeLabel}
-                    </p>
-                    {item.verified && (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-400">
-                        <BadgeCheck
-                          className="w-3.5 h-3.5"
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">
+                        <Play
+                          className="w-4 h-4 fill-current ml-0.5"
                           aria-hidden="true"
                         />
-                        Verified
                       </span>
-                    )}
+                    </span>
                   </div>
-                </div>
-              </article>
+                  <div className="p-3">
+                    <h3 className="text-sm font-medium text-white line-clamp-1">
+                      {item.title}
+                    </h3>
+                    <div className="mt-1.5 flex items-center justify-between gap-2">
+                      <p className="text-[11px] text-zinc-500">
+                        Video • {item.relativeLabel}
+                      </p>
+                      {item.verified && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-400">
+                          <BadgeCheck
+                            className="w-3.5 h-3.5"
+                            aria-hidden="true"
+                          />
+                          Verified
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
