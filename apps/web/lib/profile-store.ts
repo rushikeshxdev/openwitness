@@ -10,6 +10,10 @@ import {
   type ProfileViewModel,
   type StoredProfile,
 } from "@/data/profile-data";
+import {
+  getUnreadNotificationCount,
+  markAllNotificationsRead as markCenterAllRead,
+} from "@/lib/notifications-store";
 
 export type { StoredProfile };
 
@@ -61,8 +65,10 @@ export function loadProfileViewModel(
     vm.notifications = vm.notifications.map((n) =>
       read.has(n.id) ? { ...n, unread: false } : n
     );
-    vm.navCounts.notifications = vm.notifications.filter((n) => n.unread).length;
   }
+
+  // Prefer Notifications Center unread as the shared badge source.
+  vm.navCounts.notifications = getUnreadNotificationCount();
 
   return vm;
 }
@@ -72,4 +78,5 @@ export function markAllNotificationsRead(session: MockSessionUser) {
   setStoredProfile({
     readNotificationIds: vm.notifications.map((n) => n.id),
   });
+  markCenterAllRead();
 }

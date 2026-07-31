@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Menu, X, Search, ClipboardCheck, Eye, LogOut, Settings, User } from "lucide-react";
+import { Menu, X, Search, ClipboardCheck, Eye, LogOut, Settings, User, Bell } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "./button";
 import { duration } from "@/lib/animations";
@@ -13,6 +13,11 @@ import {
   type MockSessionUser,
 } from "@/lib/auth-session";
 import { getInitials } from "@/data/profile-data";
+import {
+  getUnreadNotificationCount,
+  NOTIFICATIONS_CHANGED_EVENT,
+} from "@/lib/notifications-store";
+import { NOTIFICATIONS_PATH } from "@/data/notifications-data";
 import Link from "next/link";
 
 export interface NavbarLink {
@@ -57,12 +62,28 @@ export function Navbar({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [session, setSession] = useState<MockSessionUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!showUserMenu) return;
-    setSession(getMockSession());
+    const s = getMockSession();
+    setSession(s);
+    setUnreadNotifications(s ? getUnreadNotificationCount() : 0);
   }, [showUserMenu]);
+
+  useEffect(() => {
+    if (!showUserMenu || !session) return;
+    const sync = () => setUnreadNotifications(getUnreadNotificationCount());
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+    window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+      window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, sync);
+    };
+  }, [showUserMenu, session]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -274,6 +295,25 @@ export function Navbar({
                 ))}
 
               {showUserMenu && session ? (
+                <Link
+                  href={NOTIFICATIONS_PATH}
+                  className="relative hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-zinc-300 hover:bg-white/5 hover:text-white"
+                  aria-label={
+                    unreadNotifications > 0
+                      ? `Notifications, ${unreadNotifications} unread`
+                      : "Notifications"
+                  }
+                >
+                  <Bell className="h-4 w-4" aria-hidden="true" />
+                  {unreadNotifications > 0 ? (
+                    <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#3B82F6] px-1 text-[10px] font-bold text-white">
+                      {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                    </span>
+                  ) : null}
+                </Link>
+              ) : null}
+
+              {showUserMenu && session ? (
                 <div className="relative hidden md:block" ref={menuRef}>
                   <button
                     type="button"
@@ -293,6 +333,19 @@ export function Navbar({
                       >
                         <User className="h-4 w-4" aria-hidden="true" />
                         Profile
+                      </Link>
+                      <Link
+                        href={NOTIFICATIONS_PATH}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/5"
+                      >
+                        <Bell className="h-4 w-4" aria-hidden="true" />
+                        Notifications
+                        {unreadNotifications > 0 ? (
+                          <span className="ml-auto rounded-full bg-[#3B82F6] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                            {unreadNotifications}
+                          </span>
+                        ) : null}
                       </Link>
                       <Link
                         href="/profile/settings"
@@ -408,6 +461,19 @@ export function Navbar({
                   >
                     <User className="h-4 w-4" aria-hidden="true" />
                     Profile
+                  </Link>
+                  <Link
+                    href={NOTIFICATIONS_PATH}
+                    onClick={handleLinkClick}
+                    className="flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
+                  >
+                    <Bell className="h-4 w-4" aria-hidden="true" />
+                    Notifications
+                    {unreadNotifications > 0 ? (
+                      <span className="ml-auto rounded-full bg-[#3B82F6] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {unreadNotifications}
+                      </span>
+                    ) : null}
                   </Link>
                   <Link
                     href="/profile/settings"

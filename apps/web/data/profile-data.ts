@@ -172,7 +172,7 @@ export const PROFILE_NAV: {
   {
     id: "notifications",
     label: "Notifications",
-    href: "/profile/notifications",
+    href: "/notifications",
     countKey: "notifications",
   },
   { id: "settings", label: "Settings", href: "/profile/settings" },

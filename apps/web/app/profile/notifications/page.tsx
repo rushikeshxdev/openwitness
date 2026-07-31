@@ -1,26 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { ProfileShell } from "@/components/profile/profile-shell";
-import { ProfileNotificationsList } from "@/components/profile/profile-list-section";
-import { markAllNotificationsRead } from "@/lib/profile-store";
-
-export default function ProfileNotificationsPage() {
-  return (
-    <ProfileShell
-      breadcrumb={[
-        { label: "Profile", href: "/profile" },
-        { label: "Notifications" },
-      ]}
-    >
-      {({ profile, session, refresh }) => (
-        <ProfileNotificationsList
-          items={profile.notifications}
-          onMarkAllRead={() => {
-            markAllNotificationsRead(session);
-            refresh();
-          }}
-        />
-      )}
-    </ProfileShell>
-  );
+/** Profile notifications list now lives at the dedicated Notifications Center. */
+export default function ProfileNotificationsRedirect() {
+  redirect("/notifications");
 }
