@@ -48,6 +48,7 @@ export default async function EventTimelinePage({ params }: Props) {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main>

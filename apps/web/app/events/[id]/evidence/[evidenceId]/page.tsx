@@ -53,6 +53,7 @@ export default async function EvidenceDetailPage({ params }: Props) {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main>

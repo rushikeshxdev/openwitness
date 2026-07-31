@@ -52,3 +52,6 @@ export function safeAuthNext(
 export const REPORT_PATH = "/report";
 export const REPORT_NEXT = `/register?next=${encodeURIComponent(REPORT_PATH)}`;
 export const LOGIN_NEXT_REPORT = `/login?next=${encodeURIComponent(REPORT_PATH)}`;
+export const PROFILE_PATH = "/profile";
+export const LOGIN_NEXT_PROFILE = `/login?next=${encodeURIComponent(PROFILE_PATH)}`;
+export const REGISTER_NEXT_PROFILE = `/register?next=${encodeURIComponent(PROFILE_PATH)}`;

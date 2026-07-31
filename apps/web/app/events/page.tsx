@@ -39,6 +39,7 @@ export default function ExploreEventsPage() {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main id="explore-main">

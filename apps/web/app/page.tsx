@@ -78,6 +78,7 @@ export default function HomePage() {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main

@@ -50,6 +50,7 @@ export default async function EventDetailPage({ params }: Props) {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main>

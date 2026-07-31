@@ -32,6 +32,7 @@ export default function MapPage() {
           href: "/report",
         }}
         showSearch
+        showUserMenu
       />
 
       <main id="map-workspace" className="h-full">

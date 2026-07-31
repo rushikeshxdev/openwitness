@@ -2,11 +2,18 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Menu, X, Search, ClipboardCheck, Eye } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { Menu, X, Search, ClipboardCheck, Eye, LogOut, Settings, User } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "./button";
 import { duration } from "@/lib/animations";
 import { ReportIncidentGate } from "@/components/auth/report-incident-gate";
+import {
+  clearMockSession,
+  getMockSession,
+  type MockSessionUser,
+} from "@/lib/auth-session";
+import { getInitials } from "@/data/profile-data";
+import Link from "next/link";
 
 export interface NavbarLink {
   label: string;
@@ -27,6 +34,8 @@ interface NavbarProps {
   ctaButton?: NavbarCTA;
   showSearch?: boolean;
   searchPlaceholder?: string;
+  /** Show avatar menu when a mock session exists */
+  showUserMenu?: boolean;
   className?: string;
 }
 
@@ -40,11 +49,37 @@ export function Navbar({
   ctaButton,
   showSearch = true,
   searchPlaceholder = "Search events, places, incidents...",
+  showUserMenu = false,
   className,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [session, setSession] = useState<MockSessionUser | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showUserMenu) return;
+    setSession(getMockSession());
+  }, [showUserMenu]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [menuOpen]);
+
+  const signOut = () => {
+    clearMockSession();
+    setSession(null);
+    setMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -237,6 +272,55 @@ export function Navbar({
                     {ctaButton.label}
                   </Button>
                 ))}
+
+              {showUserMenu && session ? (
+                <div className="relative hidden md:block" ref={menuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen((v) => !v)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#3B82F6]/20 text-xs font-bold text-[#93C5FD] hover:bg-[#3B82F6]/30"
+                    aria-label="Account menu"
+                    aria-expanded={menuOpen}
+                  >
+                    {getInitials(session.name || session.email)}
+                  </button>
+                  {menuOpen ? (
+                    <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-white/12 bg-[#121214] py-1 shadow-xl">
+                      <Link
+                        href="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/5"
+                      >
+                        <User className="h-4 w-4" aria-hidden="true" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/profile/settings"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/5"
+                      >
+                        <Settings className="h-4 w-4" aria-hidden="true" />
+                        Settings
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={signOut}
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-zinc-200 hover:bg-white/5"
+                      >
+                        <LogOut className="h-4 w-4" aria-hidden="true" />
+                        Sign out
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : showUserMenu ? (
+                <Link
+                  href="/login?next=/profile"
+                  className="hidden md:inline-flex h-9 items-center rounded-xl border border-white/15 px-3 text-xs font-medium text-zinc-200 hover:bg-white/5"
+                >
+                  Sign in
+                </Link>
+              ) : null}
             </div>
 
             {/* Mobile toggle */}
@@ -315,6 +399,42 @@ export function Navbar({
                   {link.label}
                 </a>
               ))}
+              {showUserMenu && session ? (
+                <>
+                  <Link
+                    href="/profile"
+                    onClick={handleLinkClick}
+                    className="flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
+                  >
+                    <User className="h-4 w-4" aria-hidden="true" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/profile/settings"
+                    onClick={handleLinkClick}
+                    className="flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
+                  >
+                    <Settings className="h-4 w-4" aria-hidden="true" />
+                    Settings
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={signOut}
+                    className="flex min-h-[44px] w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
+                  >
+                    <LogOut className="h-4 w-4" aria-hidden="true" />
+                    Sign out
+                  </button>
+                </>
+              ) : showUserMenu ? (
+                <Link
+                  href="/login?next=/profile"
+                  onClick={handleLinkClick}
+                  className="flex min-h-[44px] items-center rounded-lg px-4 py-3 text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white"
+                >
+                  Sign in
+                </Link>
+              ) : null}
             </nav>
             {ctaButton && (
               <div className="pt-6 border-t border-white/10">
