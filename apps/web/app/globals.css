@@ -125,6 +125,14 @@ body {
   display: none;
 }
 
+/* MapLibre must fill flex parents — blank black panels usually mean 0×0 canvas */
+.maplibregl-map,
+.maplibregl-canvas-container,
+.maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Skip-link helper (Tailwind sr-only focus override) */
 .focus\:not-sr-only:focus {
   position: fixed;

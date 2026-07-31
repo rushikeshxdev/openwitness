@@ -105,13 +105,13 @@ export function MapIncidentPanel({
       )}
       aria-label={`Incident details: ${detail.title}`}
     >
-      <div className="relative aspect-[16/10] shrink-0">
+      <div className="relative h-44 shrink-0 sm:h-48 xl:h-52">
         <Image
           src={detail.thumbnailUrl}
           alt=""
           fill
           className="object-cover"
-          sizes="360px"
+          sizes="(max-width: 1024px) 100vw, 440px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-transparent to-black/20" />
         <div className="absolute left-3 top-3">
@@ -158,45 +158,45 @@ export function MapIncidentPanel({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
-        <h2 className="text-lg font-semibold leading-snug text-white">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-5">
+        <h2 className="text-xl font-semibold leading-snug text-white xl:text-[1.35rem]">
           {detail.title}
         </h2>
-        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-400">
+        <p className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-zinc-400">
           <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {detail.city}, {detail.country}
           <span className="text-zinc-600">·</span>
           {detail.startedLabel}
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-zinc-400 line-clamp-3">
+        <p className="mt-3 text-sm leading-relaxed text-zinc-400 line-clamp-4">
           {detail.description}
         </p>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-zinc-300">
+        <div className="mt-3.5 flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-zinc-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             Live
           </span>
-          <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-zinc-300">
-            <BadgeCheck className="h-3 w-3 text-[#3B82F6]" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-zinc-300">
+            <BadgeCheck className="h-3.5 w-3.5 text-[#3B82F6]" aria-hidden="true" />
             Verified
           </span>
-          <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-zinc-300">
-            <Users className="h-3 w-3" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-zinc-300">
+            <Users className="h-3.5 w-3.5" aria-hidden="true" />
             {formatStat(detail.followerCount)} Contributors
           </span>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2.5">
           {metrics.map((m) => (
             <div
               key={m.label}
-              className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+              className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3"
             >
-              <p className="text-base font-bold tabular-nums text-white">
+              <p className="text-lg font-bold tabular-nums text-white">
                 {m.value}
               </p>
-              <p className="mt-0.5 text-[10px] text-zinc-500">{m.label}</p>
+              <p className="mt-1 text-[11px] text-zinc-500">{m.label}</p>
             </div>
           ))}
         </div>
@@ -237,7 +237,7 @@ export function MapIncidentPanel({
 
         <Link
           href={`/events/${detail.id}`}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#3B82F6] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#2563EB]"
+          className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#3B82F6] px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#2563EB]"
         >
           View Evidence
           <ArrowRight className="h-4 w-4" aria-hidden="true" />

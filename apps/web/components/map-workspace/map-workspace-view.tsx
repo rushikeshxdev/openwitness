@@ -13,7 +13,7 @@ const MapCanvas = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex h-full w-full items-center justify-center bg-[#0B0E11] text-sm text-zinc-500"
+        className="flex h-full min-h-[320px] w-full items-center justify-center bg-[#0B0E11] text-sm text-zinc-500"
         aria-hidden
       >
         Loading map…
@@ -101,13 +101,13 @@ export function MapWorkspaceView() {
   }, [selectedEventId, filtered]);
 
   return (
-    <div className="relative flex h-[calc(100vh-5.5rem)] min-h-[560px] flex-col gap-3 px-3 pb-3 pt-24 sm:px-4 lg:px-5">
+    <div className="relative flex h-dvh min-h-[640px] flex-col gap-2.5 px-2 pb-2.5 pt-[4.75rem] sm:gap-3 sm:px-3 sm:pb-3 sm:pt-20 md:px-4 lg:gap-3.5 lg:px-4 xl:px-5">
       {/* Mobile toolbar */}
-      <div className="flex gap-2 lg:hidden">
+      <div className="flex shrink-0 gap-2 lg:hidden">
         <button
           type="button"
           onClick={() => setFiltersOpen(true)}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/12 bg-[#121214]/90 px-3 py-2.5 text-sm text-zinc-200"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/12 bg-[#121214]/90 px-3 py-2.5 text-sm text-zinc-200"
         >
           <Filter className="h-4 w-4" aria-hidden="true" />
           Filters
@@ -115,14 +115,21 @@ export function MapWorkspaceView() {
         <button
           type="button"
           onClick={() => setPanelOpen(true)}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/12 bg-[#121214]/90 px-3 py-2.5 text-sm text-zinc-200"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/12 bg-[#121214]/90 px-3 py-2.5 text-sm text-zinc-200"
         >
           <PanelRight className="h-4 w-4" aria-hidden="true" />
           Details
         </button>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)_360px]">
+      <div
+        className={cn(
+          "grid min-h-0 flex-1 grid-cols-1 gap-2.5 sm:gap-3 lg:gap-3.5",
+          "lg:grid-cols-[minmax(280px,300px)_minmax(0,1fr)_minmax(340px,380px)]",
+          "xl:grid-cols-[minmax(300px,340px)_minmax(0,1fr)_minmax(380px,420px)]",
+          "2xl:grid-cols-[340px_minmax(0,1fr)_440px]"
+        )}
+      >
         {/* Left filters — desktop */}
         <div className="hidden min-h-0 flex-col gap-3 lg:flex">
           <MapFilters
@@ -134,12 +141,12 @@ export function MapWorkspaceView() {
             onClear={clearFilters}
             className="min-h-0 flex-1"
           />
-          <MapStatsCard />
+          <MapStatsCard className="shrink-0" />
         </div>
 
-        {/* Center map + activity */}
-        <div className="flex min-h-0 min-w-0 flex-col gap-3">
-          <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-2xl border border-white/12">
+        {/* Center map + activity — map dominates vertical space */}
+        <div className="flex min-h-0 min-w-0 flex-col gap-2.5 sm:gap-3">
+          <div className="relative min-h-[360px] flex-[1.65] overflow-hidden rounded-2xl border border-white/12 sm:min-h-[420px] lg:min-h-[320px]">
             <MapCanvas
               geojson={geojson}
               selectedEventId={effectiveSelected}
@@ -186,16 +193,16 @@ export function MapWorkspaceView() {
         />
         <div
           className={cn(
-            "absolute inset-y-0 left-0 flex w-[min(100%,320px)] flex-col gap-3 bg-[#0B0E11] p-3 shadow-2xl transition-transform duration-300",
+            "absolute inset-y-0 left-0 flex w-[min(100%,360px)] flex-col gap-3 bg-[#0B0E11] p-3 shadow-2xl transition-transform duration-300",
             filtersOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between pt-1">
             <span className="text-sm font-semibold text-white">Filters</span>
             <button
               type="button"
               onClick={() => setFiltersOpen(false)}
-              className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white"
+              className="rounded-lg p-2.5 text-zinc-400 hover:bg-white/5 hover:text-white"
               aria-label="Close filters drawer"
             >
               <X className="h-4 w-4" />
@@ -233,7 +240,7 @@ export function MapWorkspaceView() {
         />
         <div
           className={cn(
-            "absolute inset-y-0 right-0 w-[min(100%,380px)] bg-[#0B0E11] p-3 shadow-2xl transition-transform duration-300",
+            "absolute inset-y-0 right-0 w-[min(100%,420px)] bg-[#0B0E11] p-3 shadow-2xl transition-transform duration-300",
             panelOpen ? "translate-x-0" : "translate-x-full"
           )}
         >

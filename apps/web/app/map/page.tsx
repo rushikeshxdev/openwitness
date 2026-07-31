@@ -17,7 +17,7 @@ const navLinks = [
 
 export default function MapPage() {
   return (
-    <div className="min-h-screen overflow-hidden bg-[#0B0E11] text-text-primary">
+    <div className="h-dvh overflow-hidden bg-[#0B0E11] text-text-primary">
       <a
         href="#map-workspace"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white"
@@ -34,7 +34,7 @@ export default function MapPage() {
         showSearch
       />
 
-      <main id="map-workspace">
+      <main id="map-workspace" className="h-full">
         <MapWorkspaceView />
       </main>
     </div>
