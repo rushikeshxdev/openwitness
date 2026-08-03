@@ -125,12 +125,25 @@ body {
   display: none;
 }
 
-/* MapLibre must fill flex parents — blank black panels usually mean 0×0 canvas */
-.maplibregl-map,
-.maplibregl-canvas-container,
-.maplibregl-canvas {
-  width: 100% !important;
-  height: 100% !important;
+/* Leaflet must fill flex parents — blank panels usually mean 0×0 container */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #0b0e11;
+  font: inherit;
+}
+
+.leaflet-tooltip {
+  background: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e4e4e7;
+  box-shadow: none;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Skip-link helper (Tailwind sr-only focus override) */

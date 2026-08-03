@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "../glass-card";
 import {
@@ -11,6 +11,8 @@ import {
   type EventDetailViewModel,
 } from "@/data/event-detail-data";
 import type { EventDetailTab } from "./event-detail-view";
+import { LeafletEventMapClient } from "@/components/map/leaflet-event-map-client";
+import type { LeafletMapMarker } from "@/components/map/leaflet-event-map";
 import {
   BadgeCheck,
   Play,
@@ -21,8 +23,6 @@ import {
   Instagram,
   Facebook,
   Newspaper,
-  Plus,
-  Minus,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -53,7 +53,6 @@ export function EventDetailOverview({
   detail,
   onOpenTab,
 }: EventDetailOverviewProps) {
-  const [zoom, setZoom] = useState(1);
   const evidenceRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -64,6 +63,19 @@ export function EventDetailOverview({
       : detail.impactLevel === "medium"
         ? "bg-orange-400"
         : "bg-emerald-400";
+
+  const mapMarkers = useMemo<LeafletMapMarker[]>(() => {
+    if (!detail.coordinates) return [];
+    return [
+      {
+        id: detail.id,
+        latitude: detail.coordinates.latitude,
+        longitude: detail.coordinates.longitude,
+        title: detail.title,
+        status: detail.status,
+      },
+    ];
+  }, [detail]);
 
   const checkEvidenceScroll = useCallback(() => {
     const el = evidenceRef.current;
@@ -91,14 +103,10 @@ export function EventDetailOverview({
     });
   };
 
-  const markerScale = 0.85 + zoom * 0.2;
-
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-start">
-        {/* Left column */}
         <div className="lg:col-span-8 space-y-5">
-          {/* Interactive map */}
           <GlassCard className="p-4 sm:p-5 bg-[#121214]/90 border-white/[0.12]">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold text-white">
@@ -114,94 +122,39 @@ export function EventDetailOverview({
               </button>
             </div>
             <div className="relative h-[240px] sm:h-[300px] rounded-xl overflow-hidden bg-[#0a1220] border border-white/8">
-              <svg
-                viewBox="0 0 100 100"
-                className="absolute inset-0 w-full h-full opacity-45"
-                aria-hidden="true"
-                style={{
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "center",
-                  transition: "transform 200ms ease",
-                }}
-              >
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <line
-                    key={`h-${i}`}
-                    x1="0"
-                    y1={8 + i * 8}
-                    x2="100"
-                    y2={8 + i * 8}
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth="0.3"
-                  />
-                ))}
-                {Array.from({ length: 14 }).map((_, i) => (
-                  <line
-                    key={`v-${i}`}
-                    x1={6 + i * 7}
-                    y1="0"
-                    x2={6 + i * 7}
-                    y2="100"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth="0.3"
-                  />
-                ))}
-                <path
-                  d="M10 70 Q 30 40 50 55 T 90 35"
-                  fill="none"
-                  stroke="rgba(59,130,246,0.4)"
-                  strokeWidth="1.2"
-                />
-                <path
-                  d="M5 30 Q 40 20 70 45 T 95 70"
-                  fill="none"
-                  stroke="rgba(148,163,184,0.3)"
-                  strokeWidth="0.8"
-                />
-              </svg>
-              {detail.mapClusters.map((c) => (
-                <div
-                  key={c.id}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-200"
-                  style={{
-                    left: `${c.x}%`,
-                    top: `${c.y}%`,
-                    transform: `translate(-50%, -50%) scale(${markerScale})`,
+              {mapMarkers.length > 0 ? (
+                <LeafletEventMapClient
+                  markers={mapMarkers}
+                  center={{
+                    latitude: detail.coordinates!.latitude,
+                    longitude: detail.coordinates!.longitude,
+                    zoom: 11,
                   }}
-                  title={`${c.label}: ${c.count}`}
-                >
-                  <div className="relative flex items-center justify-center">
-                    <span className="absolute w-12 h-12 rounded-full bg-[#3B82F6]/25 motion-safe:animate-pulse" />
-                    <span className="relative z-10 min-w-[2rem] h-8 px-2 rounded-full bg-[#3B82F6] text-white text-xs font-bold flex items-center justify-center shadow-[0_0_12px_rgba(59,130,246,0.7)]">
-                      {c.count}
-                    </span>
-                  </div>
+                  selectedId={detail.id}
+                  cluster={false}
+                  interactive
+                  showZoomControls
+                  showAttribution={false}
+                  ariaLabel={`Map of ${detail.title}`}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-zinc-500">
+                  No coordinates available for this event
                 </div>
-              ))}
-
-              {/* Zoom controls */}
-              <div className="absolute bottom-3 right-3 flex flex-col gap-1.5 z-20">
-                <button
-                  type="button"
-                  aria-label="Zoom in"
-                  onClick={() => setZoom((z) => Math.min(1.6, z + 0.15))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-black/60 text-white hover:bg-black/80 backdrop-blur-md"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Zoom out"
-                  onClick={() => setZoom((z) => Math.max(0.7, z - 0.15))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-black/60 text-white hover:bg-black/80 backdrop-blur-md"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-              </div>
+              )}
             </div>
+            <p className="mt-2.5 text-xs text-zinc-500 inline-flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#60A5FA]" aria-hidden="true" />
+              {detail.city}, {detail.country}
+              {detail.coordinates && (
+                <span className="tabular-nums text-zinc-600">
+                  · {detail.coordinates.latitude.toFixed(4)},{" "}
+                  {detail.coordinates.longitude.toFixed(4)}
+                </span>
+              )}
+            </p>
           </GlassCard>
 
-          {/* Timeline overview */}
           <GlassCard className="p-4 sm:p-5 bg-[#121214]/90 border-white/[0.12]">
             <div className="flex items-center justify-between mb-4 gap-3">
               <h2 className="text-base font-semibold text-white">
@@ -249,7 +202,7 @@ export function EventDetailOverview({
                         {item.summary}
                       </p>
                     </div>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-zinc-400 shrink-0">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
                       <SourceIcon source={item.source} />
                       {sourceAbbrev(item.source)}
                     </span>
@@ -257,26 +210,12 @@ export function EventDetailOverview({
                 </li>
               ))}
             </ol>
-            <div className="mt-4 pt-3 border-t border-white/8 flex justify-end">
-              <button
-                type="button"
-                onClick={() => onOpenTab?.("timeline")}
-                className="text-sm font-medium text-[#60A5FA] hover:text-white inline-flex items-center gap-1"
-              >
-                View full timeline
-                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
-            </div>
           </GlassCard>
         </div>
 
-        {/* Right sidebar */}
-        <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
+        <aside className="lg:col-span-4 space-y-4">
           <GlassCard className="p-4 sm:p-5 bg-[#121214]/90 border-white/[0.12]">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500 mb-2.5">
-              Event Status
-            </h3>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inset-0 rounded-full bg-emerald-400 motion-safe:animate-ping opacity-60" />
                 <span className="relative rounded-full h-2.5 w-2.5 bg-emerald-400" />
@@ -408,7 +347,6 @@ export function EventDetailOverview({
         </aside>
       </div>
 
-      {/* Evidence highlights */}
       <section>
         <div className="flex items-center justify-between mb-4 gap-3">
           <h2 className="text-lg sm:text-xl font-semibold text-white">

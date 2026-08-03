@@ -1,49 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { GlassCard } from "../glass-card";
 import { cn } from "@/lib/utils";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import type { Event } from "@/types/event";
-
-const HOTSPOTS = [
-  { cx: 22, cy: 34, r: 2.4 },
-  { cx: 28, cy: 52, r: 1.8 },
-  { cx: 48, cy: 28, r: 2.2 },
-  { cx: 52, cy: 48, r: 1.7 },
-  { cx: 72, cy: 34, r: 2.6 },
-  { cx: 80, cy: 42, r: 1.9 },
-] as const;
-
-function buildWorldDots() {
-  const dots: Array<{ x: number; y: number }> = [];
-  for (let y = 8; y <= 78; y += 3.2) {
-    for (let x = 4; x <= 96; x += 3.2) {
-      const inAmericas =
-        x >= 8 &&
-        x <= 36 &&
-        y >= 14 &&
-        y <= 70 &&
-        Math.sin((y - 16) * 0.09) * 5 + 18 > x - 10;
-      const inEuropeAfrica =
-        x >= 40 && x <= 58 && y >= 14 && y <= 68 && !(x > 54 && y < 22);
-      const inAsia =
-        x >= 58 && x <= 92 && y >= 14 && y <= 54 && (x < 86 || y < 44);
-      const inOceania = x >= 78 && x <= 94 && y >= 56 && y <= 74;
-      if (
-        (inAmericas || inEuropeAfrica || inAsia || inOceania) &&
-        Math.round(x * 7 + y * 13) % 3 !== 0
-      ) {
-        dots.push({ x, y });
-      }
-    }
-  }
-  return dots;
-}
-
-const WORLD_DOTS = buildWorldDots();
+import { LeafletEventMapClient } from "@/components/map/leaflet-event-map-client";
+import type { LeafletMapMarker } from "@/components/map/leaflet-event-map";
 
 export interface LiveEventMapWidgetProps {
+  events: Event[];
   activeEvents: number;
   cities: number;
   countries: number;
@@ -52,12 +20,29 @@ export interface LiveEventMapWidgetProps {
 }
 
 export function LiveEventMapWidget({
+  events,
   activeEvents,
   cities,
   countries,
   href = "/map",
   className,
 }: LiveEventMapWidgetProps) {
+  const router = useRouter();
+
+  const markers = useMemo<LeafletMapMarker[]>(
+    () =>
+      events
+        .filter((e) => e.location.coordinates)
+        .map((e) => ({
+          id: e.id,
+          latitude: e.location.coordinates!.latitude,
+          longitude: e.location.coordinates!.longitude,
+          title: e.title,
+          status: e.status,
+        })),
+    [events]
+  );
+
   return (
     <GlassCard
       className={cn("p-4 bg-black/45 border-white/[0.12]", className)}
@@ -72,42 +57,16 @@ export function LiveEventMapWidget({
           <ArrowRight className="ml-1 w-3.5 h-3.5" aria-hidden="true" />
         </Link>
       </div>
-      <div className="h-[120px] rounded-lg overflow-hidden mb-3 bg-black/30">
-        <svg
-          viewBox="0 0 100 80"
-          className="w-full h-full"
-          aria-hidden="true"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {WORLD_DOTS.map((d, i) => (
-            <circle
-              key={i}
-              cx={d.x}
-              cy={d.y}
-              r={0.5}
-              className="fill-white/25"
-            />
-          ))}
-          {HOTSPOTS.map((h, i) => (
-            <g key={i}>
-              <circle
-                cx={h.cx}
-                cy={h.cy}
-                r={h.r * 2.4}
-                className="fill-[#3B82F6]/20 motion-safe:animate-pulse"
-              />
-              <circle
-                cx={h.cx}
-                cy={h.cy}
-                r={h.r}
-                className="fill-[#3B82F6]"
-                style={{
-                  filter: "drop-shadow(0 0 4px rgba(59,130,246,0.9))",
-                }}
-              />
-            </g>
-          ))}
-        </svg>
+      <div className="h-[140px] rounded-lg overflow-hidden mb-3 border border-white/8 bg-[#0B0E11]">
+        <LeafletEventMapClient
+          markers={markers}
+          cluster
+          interactive={false}
+          showZoomControls={false}
+          showAttribution={false}
+          ariaLabel="Live events around the world"
+          onSelect={(id) => router.push(`/events/${id}`)}
+        />
       </div>
       <div className="grid grid-cols-3 gap-2 text-center">
         {[

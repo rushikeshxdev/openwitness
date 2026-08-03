@@ -44,7 +44,6 @@ export function MapWorkspaceView() {
     latitude: number;
     zoom?: number;
   } | null>(null);
-  const [viewMode, setViewMode] = useState<"map" | "globe">("map");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
 
@@ -151,8 +150,6 @@ export function MapWorkspaceView() {
               geojson={geojson}
               selectedEventId={effectiveSelected}
               flyTo={flyTo}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
               onSelect={selectEvent}
             />
           </div>

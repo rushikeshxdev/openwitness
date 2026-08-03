@@ -226,6 +226,7 @@ export function ExploreEventsView() {
           {/* Right widgets */}
           <aside className="lg:col-span-3 space-y-4 lg:sticky lg:top-24">
             <LiveEventMapWidget
+              events={filtered}
               activeEvents={exploreMapStats.activeEvents}
               cities={exploreMapStats.cities}
               countries={exploreMapStats.countries}

@@ -21,9 +21,9 @@ import { LANDING_REFERENCE_TIME } from "./events-data";
 export { DATE_RANGE_OPTIONS, REGION_OPTIONS, CATEGORY_LABEL };
 export type { DateRangeValue };
 
-export const DEFAULT_MAP_STYLE =
-  process.env.NEXT_PUBLIC_MAP_STYLE_URL ??
-  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+export const DEFAULT_TILE_URL =
+  process.env.NEXT_PUBLIC_MAP_TILE_URL ??
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
 export const MAP_STATS = {
   totalActive: exploreMapStats.activeEvents,

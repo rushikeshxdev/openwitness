@@ -39,6 +39,10 @@ export interface EventDetailViewModel {
   thumbnailUrl: string;
   city: string;
   country: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
   status: ExploreStatus;
   category: EventCategory;
   impactLevel: "low" | "medium" | "high";
@@ -305,6 +309,7 @@ export function buildEventDetail(id: string): EventDetailViewModel | null {
     thumbnailUrl: override.thumbnailUrl ?? event.thumbnailUrl,
     city: event.location.city,
     country: event.location.country,
+    coordinates: event.location.coordinates,
     status: event.status ?? "under_review",
     category: event.category ?? "other",
     impactLevel: override.impactLevel ?? (event.status === "live" ? "high" : "medium"),

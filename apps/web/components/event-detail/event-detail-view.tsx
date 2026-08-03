@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
   MapPin,
@@ -14,6 +14,9 @@ import {
 import type { EventDetailViewModel } from "@/data/event-detail-data";
 import { formatStat } from "@/data/event-detail-data";
 import { EventDetailOverview } from "./event-detail-overview";
+import { LeafletEventMapClient } from "@/components/map/leaflet-event-map-client";
+import type { LeafletMapMarker } from "@/components/map/leaflet-event-map";
+import { GlassCard } from "@/components/glass-card";
 import { useRouter } from "next/navigation";
 
 export type EventDetailTab =
@@ -44,6 +47,19 @@ export function EventDetailView({ detail }: EventDetailViewProps) {
   const [following, setFollowing] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const badge = STATUS_BADGE[detail.status];
+
+  const mapMarkers = useMemo<LeafletMapMarker[]>(() => {
+    if (!detail.coordinates) return [];
+    return [
+      {
+        id: detail.id,
+        latitude: detail.coordinates.latitude,
+        longitude: detail.coordinates.longitude,
+        title: detail.title,
+        status: detail.status,
+      },
+    ];
+  }, [detail]);
 
   const openTab = useCallback(
     (next: EventDetailTab) => {
@@ -253,7 +269,54 @@ export function EventDetailView({ detail }: EventDetailViewProps) {
         {tab === "overview" && (
           <EventDetailOverview detail={detail} onOpenTab={openTab} />
         )}
-        {tab !== "overview" && (
+        {tab === "map" && (
+          <GlassCard className="p-4 sm:p-5 bg-[#121214]/90 border-white/[0.12]">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">Event Map</h2>
+                <p className="mt-1 text-sm text-zinc-400 inline-flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#60A5FA]" aria-hidden="true" />
+                  {detail.city}, {detail.country}
+                  {detail.coordinates && (
+                    <span className="tabular-nums text-zinc-600">
+                      · {detail.coordinates.latitude.toFixed(4)},{" "}
+                      {detail.coordinates.longitude.toFixed(4)}
+                    </span>
+                  )}
+                </p>
+              </div>
+              <Link
+                href="/map"
+                className="text-sm font-medium text-[#60A5FA] hover:text-white"
+              >
+                Open Live Map
+              </Link>
+            </div>
+            <div className="relative h-[420px] sm:h-[520px] rounded-xl overflow-hidden border border-white/8 bg-[#0a1220]">
+              {mapMarkers.length > 0 ? (
+                <LeafletEventMapClient
+                  markers={mapMarkers}
+                  center={{
+                    latitude: detail.coordinates!.latitude,
+                    longitude: detail.coordinates!.longitude,
+                    zoom: 12,
+                  }}
+                  selectedId={detail.id}
+                  cluster={false}
+                  interactive
+                  showZoomControls
+                  showAttribution
+                  ariaLabel={`Full map of ${detail.title}`}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-zinc-500">
+                  No coordinates available for this event
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        )}
+        {tab !== "overview" && tab !== "map" && (
           <div className="rounded-2xl border border-white/10 bg-black/35 px-6 py-16 text-center">
             <p className="text-lg font-medium text-white capitalize">{tab}</p>
             <p className="mt-2 text-sm text-zinc-400 max-w-md mx-auto">
