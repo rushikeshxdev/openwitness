@@ -70,7 +70,14 @@ export interface ProfileBadge {
   id: string;
   title: string;
   earnedLabel: string;
-  tone: "blue" | "emerald" | "amber" | "violet";
+  tone: "blue" | "emerald" | "amber" | "violet" | "cyan" | "rose";
+  subtitle?: string;
+}
+
+export interface ProfileAchievement {
+  id: string;
+  title: string;
+  description: string;
 }
 
 export interface ProfileActivityItem {
@@ -117,6 +124,70 @@ export interface ProfileSettingsState {
   compactMode: boolean;
 }
 
+export interface ProfileContributorStats {
+  evidenceUploaded: number;
+  evidenceUploadedDelta: number;
+  verifiedEvidence: number;
+  verifiedPercent: number;
+  reportsPublished: number;
+  reportsDelta: number;
+  reviewsCompleted: number;
+  reviewsDelta: number;
+  reviewAccuracy: number;
+  reviewAccuracyLabel: string;
+}
+
+export interface ProfileTrustScore {
+  score: number;
+  max: number;
+  label: string;
+}
+
+export interface ProfileReputationItem {
+  id: string;
+  label: string;
+  value: number;
+  max: number;
+  color: string;
+}
+
+export interface ProfileOrgWorkedWith {
+  id: string;
+  name: string;
+  initials: string;
+  accent: string;
+  contributions: number;
+  href?: string;
+}
+
+export interface ProfileContributionCard {
+  id: string;
+  title: string;
+  location: string;
+  dateLabel: string;
+  thumbnailUrl: string;
+  tags: string[];
+  status: "verified" | "under_review" | "pending";
+  verifiedBy?: string;
+  href?: string;
+}
+
+export interface ProfileHeatmapStats {
+  daysActive: number;
+  eventsContributed: number;
+  organizationsWorkedWith: number;
+  countriesContributed: number;
+}
+
+export type ContributorTabId =
+  | "overview"
+  | "activity"
+  | "contributions"
+  | "reviews"
+  | "badges"
+  | "following"
+  | "followers";
+
 export interface ProfileViewModel {
   id: string;
   name: string;
@@ -129,14 +200,30 @@ export interface ProfileViewModel {
   links: ProfileLinks;
   role: string;
   memberSinceLabel: string;
+  joinLabel: string;
   stats: ProfileStats;
+  contributorStats: ProfileContributorStats;
+  trustScore: ProfileTrustScore;
+  reputation: ProfileReputationItem[];
+  reputationTotal: number;
+  skills: string[];
+  organizationsWorkedWith: ProfileOrgWorkedWith[];
+  heatmap: number[];
+  heatmapYear: number;
+  heatmapStats: ProfileHeatmapStats;
+  recentContributions: ProfileContributionCard[];
+  achievements: ProfileAchievement[];
+  followersCount: number;
+  followingCount: number;
   activitySeries: ProfileActivityPoint[];
   badges: ProfileBadge[];
   recentActivity: ProfileActivityItem[];
   reports: ProfileListItem[];
   bookmarks: ProfileListItem[];
   following: ProfileListItem[];
+  followers: ProfileListItem[];
   contributions: ProfileListItem[];
+  reviews: ProfileListItem[];
   notifications: ProfileNotification[];
   settings: ProfileSettingsState;
   navCounts: {
@@ -176,6 +263,20 @@ export const PROFILE_NAV: {
     countKey: "notifications",
   },
   { id: "settings", label: "Settings", href: "/profile/settings" },
+];
+
+export const CONTRIBUTOR_TABS: {
+  id: ContributorTabId;
+  label: string;
+  countKey?: "followingCount" | "followersCount";
+}[] = [
+  { id: "overview", label: "Overview" },
+  { id: "activity", label: "Activity" },
+  { id: "contributions", label: "Contributions" },
+  { id: "reviews", label: "Reviews" },
+  { id: "badges", label: "Badges" },
+  { id: "following", label: "Following", countKey: "followingCount" },
+  { id: "followers", label: "Followers", countKey: "followersCount" },
 ];
 
 export const SETTINGS_NAV: { id: SettingsSectionId; label: string }[] = [
@@ -236,27 +337,209 @@ const DEFAULT_ACTIVITY: ProfileActivityPoint[] = [
 const DEFAULT_BADGES: ProfileBadge[] = [
   {
     id: "b1",
-    title: "Active Reporter",
+    title: "Trusted Reviewer",
     earnedLabel: "Earned May 12, 2024",
+    subtitle: "Top 5% reviewers",
     tone: "blue",
   },
   {
     id: "b2",
-    title: "Verifier",
+    title: "Photo Expert",
     earnedLabel: "Earned Jun 3, 2024",
+    subtitle: "200+ photo verifications",
     tone: "emerald",
   },
   {
     id: "b3",
-    title: "Community Helper",
+    title: "Local Guide",
     earnedLabel: "Earned Jun 28, 2024",
+    subtitle: "Maharashtra coverage",
     tone: "amber",
   },
   {
     id: "b4",
-    title: "Top Contributor",
+    title: "Fact Checker",
     earnedLabel: "Earned Jul 15, 2024",
+    subtitle: "High accuracy streak",
     tone: "violet",
+  },
+  {
+    id: "b5",
+    title: "Global Contributor",
+    earnedLabel: "Earned Aug 1, 2024",
+    subtitle: "9 countries contributed",
+    tone: "cyan",
+  },
+];
+
+const DEFAULT_ACHIEVEMENTS: ProfileAchievement[] = [
+  {
+    id: "ach1",
+    title: "Milestone: 100 Verified Evidence",
+    description: "Reached 100 community-verified uploads",
+  },
+  {
+    id: "ach2",
+    title: "First Organization Endorsement",
+    description: "Endorsed by Amnesty International India",
+  },
+  {
+    id: "ach3",
+    title: "Week Streak: 14 Days",
+    description: "Contributed evidence 14 days in a row",
+  },
+];
+
+function buildHeatmap(seed = 42): number[] {
+  const cells: number[] = [];
+  let s = seed;
+  for (let i = 0; i < 371; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const r = s % 100;
+    if (r < 35) cells.push(0);
+    else if (r < 55) cells.push(1);
+    else if (r < 75) cells.push(2);
+    else if (r < 90) cells.push(3);
+    else cells.push(4);
+  }
+  return cells;
+}
+
+const DEFAULT_RECENT_CONTRIBUTIONS: ProfileContributionCard[] = [
+  {
+    id: "rc1",
+    title: "Protest at India Gate",
+    location: "New Delhi, India",
+    dateLabel: "May 17, 2024",
+    thumbnailUrl: "/images/events/event1.jpg",
+    tags: ["Video", "1:24"],
+    status: "verified",
+    verifiedBy: "Amnesty International",
+    href: "/events/1",
+  },
+  {
+    id: "rc2",
+    title: "Assam Flood Documentation",
+    location: "Guwahati, Assam",
+    dateLabel: "May 20, 2024",
+    thumbnailUrl: "/images/events/event3.jpg",
+    tags: ["Photo", "Series"],
+    status: "verified",
+    verifiedBy: "The Wire",
+    href: "/events/3",
+  },
+  {
+    id: "rc3",
+    title: "Farmers March – Noida",
+    location: "Noida, India",
+    dateLabel: "May 22, 2024",
+    thumbnailUrl: "/images/events/event2.jpg",
+    tags: ["Video", "0:48"],
+    status: "under_review",
+    href: "/events/2",
+  },
+  {
+    id: "rc4",
+    title: "Campus Gathering – Pune",
+    location: "Pune, India",
+    dateLabel: "May 25, 2024",
+    thumbnailUrl: "/images/events/event4.jpg",
+    tags: ["Photo"],
+    status: "verified",
+    verifiedBy: "PUCL",
+    href: "/events/4",
+  },
+];
+
+const DEFAULT_ORGS_WORKED: ProfileOrgWorkedWith[] = [
+  {
+    id: "amnesty",
+    name: "Amnesty International",
+    initials: "A",
+    accent: "#F59E0B",
+    contributions: 42,
+    href: "/organizations/amnesty",
+  },
+  {
+    id: "red-cross",
+    name: "Red Cross",
+    initials: "RC",
+    accent: "#EF4444",
+    contributions: 18,
+  },
+  {
+    id: "reuters",
+    name: "Reuters",
+    initials: "R",
+    accent: "#F97316",
+    contributions: 12,
+  },
+  {
+    id: "the-wire",
+    name: "The Wire",
+    initials: "TW",
+    accent: "#EF4444",
+    contributions: 27,
+    href: "/organizations/the-wire",
+  },
+  {
+    id: "human-rights",
+    name: "Human Rights Watch",
+    initials: "HR",
+    accent: "#3B82F6",
+    contributions: 9,
+    href: "/organizations/human-rights",
+  },
+];
+
+const DEFAULT_REPUTATION: ProfileReputationItem[] = [
+  { id: "identity", label: "Identity Verification", value: 20, max: 20, color: "#10B981" },
+  { id: "accuracy", label: "Evidence Accuracy", value: 25, max: 25, color: "#3B82F6" },
+  { id: "reviews", label: "Community Reviews", value: 18, max: 20, color: "#8B5CF6" },
+  { id: "endorsements", label: "Organization Endorsements", value: 15, max: 15, color: "#F97316" },
+  { id: "longevity", label: "Longevity", value: 10, max: 10, color: "#14B8A6" },
+  { id: "review-acc", label: "Review Accuracy", value: 5, max: 10, color: "#60A5FA" },
+];
+
+const DEFAULT_SKILLS = [
+  "Video Verification",
+  "Geolocation",
+  "OSINT",
+  "Research",
+  "Photo Forensics",
+  "Timeline Mapping",
+  "Source Credibility",
+  "Multilingual",
+];
+
+const DEFAULT_FOLLOWERS: ProfileListItem[] = [
+  { id: "fl1", title: "Ananya Verma", meta: "Contributor · Trust 96" },
+  { id: "fl2", title: "Rohan Mehta", meta: "Reviewer · Trust 91" },
+  { id: "fl3", title: "Amnesty International India", meta: "Organization · Verified", href: "/organizations/amnesty" },
+  { id: "fl4", title: "Priya Nair", meta: "Contributor · Trust 88" },
+];
+
+const DEFAULT_REVIEWS: ProfileListItem[] = [
+  {
+    id: "rv1",
+    title: "Reviewed evidence on Protest at India Gate",
+    meta: "Accurate · May 18, 2024",
+    status: "Accepted",
+    href: "/events/1",
+  },
+  {
+    id: "rv2",
+    title: "Geolocation check – Assam Floods",
+    meta: "Accurate · May 21, 2024",
+    status: "Accepted",
+    href: "/events/3",
+  },
+  {
+    id: "rv3",
+    title: "Source credibility – Farmers March",
+    meta: "Needs info · May 23, 2024",
+    status: "Flagged",
+    href: "/events/2",
   },
 ];
 
@@ -412,8 +695,8 @@ export function defaultStoredProfile(
     name,
     handle,
     email: session.email,
-    bio: "Documenting public events and community evidence across India. Building transparency with OpenWitness.",
-    location: "Kolhapur, India",
+    bio: "Computer Science Engineer passionate about transparency, human rights, and leveraging technology to build a better world.",
+    location: "Kolhapur, Maharashtra, India",
     language: "English",
     verified: true,
     links: {
@@ -441,45 +724,93 @@ export function buildProfile(
   stored: StoredProfile | null
 ): ProfileViewModel {
   const base = defaultStoredProfile(session);
-  const merged: StoredProfile = { ...base, ...stored, links: { ...base.links, ...stored?.links } };
-  const name = merged.name || base.name;
+  const merged: StoredProfile = {
+    ...base,
+    ...stored,
+    links: { ...base.links, ...stored?.links },
+  };
+  const name = merged.name || base.name || "User";
+  const handle = merged.handle || base.handle || "user";
+  const email = merged.email || session.email;
+  const bio =
+    merged.bio ||
+    base.bio ||
+    "Documenting public events and community evidence.";
+  const location = merged.location || base.location || "India";
+  const language = merged.language || base.language || "English";
   const lists = defaultLists(name);
+  const reputation = DEFAULT_REPUTATION;
+  const reputationTotal = reputation.reduce((sum, r) => sum + r.value, 0);
 
   const stats: ProfileStats = {
-    reports: 32,
+    reports: 27,
     bookmarks: 18,
-    following: 24,
+    following: 128,
     points: 1200,
-    verifications: 5,
+    verifications: 451,
   };
+
+  const memberSinceLabel = formatMemberSince(session.createdAt);
 
   return {
     id: `user-${session.email}`,
     name,
-    handle: merged.handle || base.handle,
-    email: merged.email || session.email,
+    handle,
+    email,
     verified: merged.verified ?? true,
     avatarUrl: merged.avatarUrl,
-    bio: merged.bio,
-    location: merged.location,
+    bio,
+    location,
     links: merged.links ?? {},
     role: session.role || "Contributor",
-    memberSinceLabel: formatMemberSince(session.createdAt),
+    memberSinceLabel,
+    joinLabel: "Joined OpenWitness · Jan 2024",
     stats,
+    contributorStats: {
+      evidenceUploaded: 482,
+      evidenceUploadedDelta: 18,
+      verifiedEvidence: 451,
+      verifiedPercent: 93.6,
+      reportsPublished: 27,
+      reportsDelta: 3,
+      reviewsCompleted: 1200,
+      reviewsDelta: 86,
+      reviewAccuracy: 98,
+      reviewAccuracyLabel: "Excellent",
+    },
+    trustScore: { score: 96, max: 100, label: "Excellent" },
+    reputation,
+    reputationTotal,
+    skills: DEFAULT_SKILLS,
+    organizationsWorkedWith: DEFAULT_ORGS_WORKED,
+    heatmap: buildHeatmap(96),
+    heatmapYear: 2024,
+    heatmapStats: {
+      daysActive: 142,
+      eventsContributed: 28,
+      organizationsWorkedWith: 12,
+      countriesContributed: 9,
+    },
+    recentContributions: DEFAULT_RECENT_CONTRIBUTIONS,
+    achievements: DEFAULT_ACHIEVEMENTS,
+    followersCount: 342,
+    followingCount: 128,
     activitySeries: DEFAULT_ACTIVITY,
     badges: DEFAULT_BADGES,
     recentActivity: lists.recentActivity,
     reports: lists.reports,
     bookmarks: lists.bookmarks,
     following: lists.following,
+    followers: DEFAULT_FOLLOWERS,
     contributions: lists.contributions,
+    reviews: DEFAULT_REVIEWS,
     notifications: lists.notifications,
     settings: {
-      username: merged.handle || base.handle,
-      email: merged.email || session.email,
-      bio: merged.bio,
-      location: merged.location,
-      language: merged.language || "English",
+      username: handle,
+      email,
+      bio,
+      location,
+      language,
       emailUpdates: merged.emailUpdates ?? true,
       pushNotifications: merged.pushNotifications ?? true,
       followPublicEvents: merged.followPublicEvents ?? true,
