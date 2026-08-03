@@ -20,9 +20,10 @@ export function generateStaticParams() {
 const navLinks = [
   { label: "Explore", href: "/events" },
   { label: "Map", href: "/map" },
+  { label: "Evidence", href: "/evidence" },
+  { label: "Reports", href: "/reports" },
   { label: "Organizations", href: "/organizations" },
   { label: "About", href: "/#about" },
-  { label: "Resources", href: "/#resources" },
 ] as const;
 
 type Props = {

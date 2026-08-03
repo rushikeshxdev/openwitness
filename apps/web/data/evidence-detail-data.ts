@@ -20,10 +20,20 @@ export type EvidenceNavSection =
 export type EvidenceContentTab =
   | "description"
   | "context"
-  | "tags"
-  | "metadata";
+  | "metadata"
+  | "verifications"
+  | "comments";
 
 export type EvidenceStatus = "verified" | "pending" | "unverified";
+
+export interface EvidenceComment {
+  id: string;
+  author: string;
+  initials: string;
+  color: string;
+  body: string;
+  timeLabel: string;
+}
 
 export interface EvidenceFileInfo {
   fileId: string;
@@ -99,6 +109,7 @@ export interface EvidenceDetailViewModel {
     mapPinY: number;
   };
   related: EvidenceRelatedItem[];
+  comments: EvidenceComment[];
   integrityMessage: string;
 }
 
@@ -415,6 +426,32 @@ function buildViewModel(
       mapPinY: 40 + (seed % 20),
     },
     related,
+    comments: [
+      {
+        id: `c1-${evidence.id}`,
+        author: "Priya S.",
+        initials: "PS",
+        color: "#8B5CF6",
+        body: "Matches other angles from the same corridor around this timestamp.",
+        timeLabel: "2h ago",
+      },
+      {
+        id: `c2-${evidence.id}`,
+        author: "Rohan M.",
+        initials: "RM",
+        color: "#10B981",
+        body: "Audio is clear enough to identify chants — useful for timeline notes.",
+        timeLabel: "5h ago",
+      },
+      {
+        id: `c3-${evidence.id}`,
+        author: "Maya L.",
+        initials: "ML",
+        color: "#F59E0B",
+        body: "Can we cross-check the placard text with stills in related evidence?",
+        timeLabel: "1d ago",
+      },
+    ],
     integrityMessage:
       "This file is hashed and integrity-protected. Any modification will invalidate the cryptographic signature.",
   };

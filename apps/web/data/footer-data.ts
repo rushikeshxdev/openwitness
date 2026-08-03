@@ -19,6 +19,8 @@ export const footerLinkColumns: FooterLinkColumn[] = [
     links: [
       { label: "About", href: "#about" },
       { label: "Organizations", href: "/organizations" },
+      { label: "Evidence", href: "/evidence" },
+      { label: "Reports", href: "/reports" },
       { label: "Documentation", href: "https://github.com/openwitness" },
     ],
   },

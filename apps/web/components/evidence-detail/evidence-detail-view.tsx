@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
   formatTimecode,
@@ -104,8 +104,9 @@ const NAV_ITEMS: {
 const CONTENT_TABS: { id: EvidenceContentTab; label: string }[] = [
   { id: "description", label: "Description" },
   { id: "context", label: "Context" },
-  { id: "tags", label: "Tags" },
   { id: "metadata", label: "Metadata" },
+  { id: "verifications", label: "Verifications" },
+  { id: "comments", label: "Comments" },
 ];
 
 function Panel({
@@ -286,6 +287,7 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
   const [nav, setNav] = useState<EvidenceNavSection>("details");
   const [tab, setTab] = useState<EvidenceContentTab>("description");
   const [playing, setPlaying] = useState(false);
+  const [fromExplorer, setFromExplorer] = useState(false);
   const [currentSeconds, setCurrentSeconds] = useState(
     detail.currentTimeSeconds
   );
@@ -297,6 +299,19 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
   });
   const [noteDraft, setNoteDraft] = useState("");
   const [shareHint, setShareHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setFromExplorer(params.get("from") === "explorer");
+  }, []);
+
+  const handleNavChange = (id: EvidenceNavSection) => {
+    setNav(id);
+    if (id === "details") setTab("description");
+    if (id === "verifications") setTab("verifications");
+    if (id === "comments") setTab("comments");
+  };
 
   const activeThumb =
     detail.filmstrip[activeFrame]?.thumbnailUrl ?? detail.thumbnailUrl;
@@ -355,16 +370,30 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
           Home
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-zinc-600 shrink-0" aria-hidden="true" />
-        <Link
-          href="/events"
-          className="hidden sm:inline hover:text-white transition-colors"
-        >
-          Explore Events
-        </Link>
-        <ChevronRight
-          className="hidden sm:block w-3.5 h-3.5 text-zinc-600 shrink-0"
-          aria-hidden="true"
-        />
+        {fromExplorer ? (
+          <>
+            <Link href="/evidence" className="hover:text-white transition-colors">
+              Evidence
+            </Link>
+            <ChevronRight
+              className="w-3.5 h-3.5 text-zinc-600 shrink-0"
+              aria-hidden="true"
+            />
+          </>
+        ) : (
+          <>
+            <Link
+              href="/events"
+              className="hidden sm:inline hover:text-white transition-colors"
+            >
+              Explore Events
+            </Link>
+            <ChevronRight
+              className="hidden sm:block w-3.5 h-3.5 text-zinc-600 shrink-0"
+              aria-hidden="true"
+            />
+          </>
+        )}
         <Link
           href={`/events/${detail.eventId}`}
           className="hover:text-white transition-colors truncate max-w-[9rem] sm:max-w-[14rem] md:max-w-xs"
@@ -372,11 +401,6 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
           {detail.eventTitle}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-zinc-600 shrink-0" aria-hidden="true" />
-        <span className="hidden md:inline text-zinc-400">Evidence</span>
-        <ChevronRight
-          className="hidden md:block w-3.5 h-3.5 text-zinc-600 shrink-0"
-          aria-hidden="true"
-        />
         <span className="text-zinc-200 font-medium tabular-nums truncate max-w-[11rem] sm:max-w-none">
           {detail.id}
         </span>
@@ -428,7 +452,7 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
             <OverviewNav
               detail={detail}
               nav={nav}
-              onNavChange={setNav}
+              onNavChange={handleNavChange}
               variant="horizontal"
             />
           </div>
@@ -447,7 +471,7 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
             <OverviewNav
               detail={detail}
               nav={nav}
-              onNavChange={setNav}
+              onNavChange={handleNavChange}
               variant="vertical"
             />
           </Panel>
@@ -592,7 +616,13 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => setTab(t.id)}
+                    onClick={() => {
+                      setTab(t.id);
+                      if (t.id === "verifications") setNav("verifications");
+                      else if (t.id === "comments") setNav("comments");
+                      else if (t.id === "description" || t.id === "context")
+                        setNav("details");
+                    }}
                     className={cn(
                       "shrink-0 min-h-10 px-3 sm:px-3.5 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
                       active
@@ -620,10 +650,141 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
                   {detail.context}
                 </p>
               ) : null}
-              {tab === "tags" ? <TagList tags={detail.tags} /> : null}
               {tab === "metadata" ? <FileInfoList rows={fileRows} /> : null}
+              {tab === "verifications" ? (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <BadgeCheck
+                      className={cn("w-5 h-5 mt-0.5", statusTone)}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className={cn("text-sm font-semibold", statusTone)}>
+                        {detail.verification.statusLabel}
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {detail.verification.verifiedAtLabel}
+                      </p>
+                      <p className="mt-2 text-sm text-zinc-400">
+                        {detail.verification.communityLabel}
+                      </p>
+                    </div>
+                  </div>
+                  {detail.verification.verifiers.length > 0 ? (
+                    <ul className="space-y-2">
+                      {detail.verification.verifiers.map((v) => (
+                        <li
+                          key={v.id}
+                          className="flex items-center gap-3 rounded-lg border border-white/10 bg-black/30 px-3 py-2.5"
+                        >
+                          <span
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                            style={{ backgroundColor: v.color }}
+                          >
+                            {v.initials}
+                          </span>
+                          <span className="text-sm text-zinc-200">{v.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-zinc-500">
+                      No verifiers yet for this file.
+                    </p>
+                  )}
+                </div>
+              ) : null}
+              {tab === "comments" ? (
+                <ul className="space-y-3">
+                  {detail.comments.map((c) => (
+                    <li
+                      key={c.id}
+                      className="rounded-xl border border-white/10 bg-black/30 px-3 py-3"
+                    >
+                      <div className="flex items-center gap-2.5 mb-1.5">
+                        <span
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                          style={{ backgroundColor: c.color }}
+                        >
+                          {c.initials}
+                        </span>
+                        <span className="text-sm font-medium text-white">
+                          {c.author}
+                        </span>
+                        <span className="text-[11px] text-zinc-500">
+                          {c.timeLabel}
+                        </span>
+                      </div>
+                      <p className="text-sm text-zinc-300 leading-relaxed">
+                        {c.body}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </Panel>
+
+          {nav === "location" ? (
+            <Panel title="Location details">
+              <div className="p-4 space-y-2 text-sm">
+                <p className="font-medium text-white">{detail.location.placeName}</p>
+                <p className="text-zinc-300 tabular-nums">
+                  {detail.location.coordinatesLabel}
+                </p>
+                <p className="text-zinc-400">{detail.location.address}</p>
+                <p className="text-xs text-zinc-500">
+                  Accuracy: {detail.location.accuracyMeters} meters
+                </p>
+              </div>
+            </Panel>
+          ) : null}
+
+          {nav === "related" ? (
+            <Panel title="Related Evidence">
+              <ul className="divide-y divide-white/10">
+                {detail.related.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={`/events/${detail.eventId}/evidence/${item.id}${fromExplorer ? "?from=explorer" : ""}`}
+                      className="flex gap-3 px-3 py-3 hover:bg-white/[0.03] transition-colors"
+                    >
+                      <div className="relative h-14 w-[72px] shrink-0 rounded-md overflow-hidden border border-white/10">
+                        <Image
+                          src={item.thumbnailUrl}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="72px"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white line-clamp-1">
+                          {item.title}
+                        </p>
+                        <p className="text-[11px] text-zinc-500">
+                          {item.typeLabel} · {item.duration}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          ) : null}
+
+          {(nav === "timeline" || nav === "reports" || nav === "history") && (
+            <Panel title={nav.charAt(0).toUpperCase() + nav.slice(1)}>
+              <p className="px-4 py-5 text-sm text-zinc-400">
+                {nav === "timeline" &&
+                  `${detail.navCounts.timeline} timeline markers linked to this file.`}
+                {nav === "reports" &&
+                  `${detail.navCounts.reports} reports reference this evidence.`}
+                {nav === "history" &&
+                  `${detail.navCounts.history} history events recorded for this file.`}
+              </p>
+            </Panel>
+          )}
 
           <Panel title="Notes">
             <div className="px-3 sm:px-4 py-4 space-y-3">

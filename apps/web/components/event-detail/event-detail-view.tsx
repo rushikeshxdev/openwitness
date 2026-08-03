@@ -14,6 +14,9 @@ import {
 import type { EventDetailViewModel } from "@/data/event-detail-data";
 import { formatStat } from "@/data/event-detail-data";
 import { EventDetailOverview } from "./event-detail-overview";
+import { EventEvidenceTab } from "./event-evidence-tab";
+import { EventReportsTab } from "./event-reports-tab";
+import { EventDiscussionsTab } from "./event-discussions-tab";
 import { LeafletEventMapClient } from "@/components/map/leaflet-event-map-client";
 import type { LeafletMapMarker } from "@/components/map/leaflet-event-map";
 import { GlassCard } from "@/components/glass-card";
@@ -269,6 +272,9 @@ export function EventDetailView({ detail }: EventDetailViewProps) {
         {tab === "overview" && (
           <EventDetailOverview detail={detail} onOpenTab={openTab} />
         )}
+        {tab === "evidence" && <EventEvidenceTab detail={detail} />}
+        {tab === "reports" && <EventReportsTab detail={detail} />}
+        {tab === "discussions" && <EventDiscussionsTab detail={detail} />}
         {tab === "map" && (
           <GlassCard className="p-4 sm:p-5 bg-[#121214]/90 border-white/[0.12]">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -316,7 +322,11 @@ export function EventDetailView({ detail }: EventDetailViewProps) {
             </div>
           </GlassCard>
         )}
-        {tab !== "overview" && tab !== "map" && (
+        {tab !== "overview" &&
+          tab !== "map" &&
+          tab !== "evidence" &&
+          tab !== "reports" &&
+          tab !== "discussions" && (
           <div className="rounded-2xl border border-white/10 bg-black/35 px-6 py-16 text-center">
             <p className="text-lg font-medium text-white capitalize">{tab}</p>
             <p className="mt-2 text-sm text-zinc-400 max-w-md mx-auto">
