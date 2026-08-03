@@ -104,7 +104,7 @@ export function Navbar({
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+      if (window.innerWidth >= 1024 && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -168,7 +168,7 @@ export function Navbar({
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 pointer-events-none",
+          "fixed top-0 left-0 right-0 z-[100] pointer-events-none",
           className
         )}
       >
@@ -179,10 +179,10 @@ export function Navbar({
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             className={cn(
-              "mx-auto max-w-[1280px] w-full",
-              "flex items-center gap-2 sm:gap-3 md:gap-4",
-              "h-12 sm:h-14 md:h-[3.75rem]",
-              "pl-3.5 sm:pl-4 md:pl-5 pr-1.5 sm:pr-2",
+              "mx-auto max-w-[1536px] w-full",
+              "flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5",
+              "h-14 md:h-16",
+              "pl-4 sm:pl-5 md:pl-6 pr-2 sm:pr-2.5",
               "rounded-full",
               "border border-white/12",
               "bg-[rgba(18,18,20,0.55)]",
@@ -193,28 +193,28 @@ export function Navbar({
             {/* Logo — eye light blue, wordmark white, left */}
             <a
               href="/"
-              className="flex items-center gap-2 shrink-0 focus:outline-none focus:ring-2 focus:ring-sky-400/50 rounded-full px-1 py-1"
+              className="relative z-10 flex items-center gap-2.5 shrink-0 focus:outline-none focus:ring-2 focus:ring-sky-400/50 rounded-full px-1 py-1"
               aria-label="Home"
             >
               {logoSrc ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoSrc} alt={logoText} className="h-7 w-auto" />
+                <img src={logoSrc} alt={logoText} className="h-8 w-auto" />
               ) : (
                 <>
                   <Eye
-                    className="h-5 w-5 text-sky-400"
+                    className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-sky-400"
                     strokeWidth={2}
                     aria-hidden="true"
                   />
-                  <span className="text-sm sm:text-[15px] font-semibold tracking-tight text-white">
+                  <span className="text-[15px] sm:text-base font-semibold tracking-tight text-white">
                     {logoText}
                   </span>
                 </>
               )}
             </a>
 
-            {/* Nav links */}
-            <div className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-2 min-w-0">
+            {/* Nav links — desktop only from lg; scroll if still tight */}
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto scrollbar-hide lg:flex xl:gap-2">
               {links.map((link) => (
                 <a
                   key={link.href}
@@ -222,10 +222,10 @@ export function Navbar({
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
                   className={cn(
-                    "text-[13px] lg:text-sm font-medium text-white/90",
+                    "shrink-0 text-[13px] xl:text-sm font-medium text-white/90",
                     "hover:text-white transition-colors duration-200",
                     "focus:outline-none focus:ring-2 focus:ring-sky-400/40 rounded-full",
-                    "px-2.5 lg:px-3.5 py-1.5 whitespace-nowrap"
+                    "px-2.5 xl:px-3.5 py-1.5 whitespace-nowrap"
                   )}
                 >
                   {link.label}
@@ -234,14 +234,14 @@ export function Navbar({
             </div>
 
             {/* Search + CTA */}
-            <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0 ml-auto">
+            <div className="hidden shrink-0 items-center gap-2.5 lg:ml-auto lg:flex xl:gap-3">
               {showSearch && (
                 <form
                   onSubmit={handleSearchSubmit}
                   role="search"
                   className={cn(
-                    "relative flex items-center h-9",
-                    "w-[200px] lg:w-[260px] xl:w-[300px]",
+                    "relative flex items-center h-10",
+                    "w-[200px] xl:w-[260px] 2xl:w-[300px]",
                     "rounded-full",
                     "border border-white/10",
                     "bg-white/[0.07]",
@@ -321,7 +321,7 @@ export function Navbar({
               {showUserMenu && session ? (
                 <Link
                   href={NOTIFICATIONS_PATH}
-                  className="relative hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-zinc-300 hover:bg-white/5 hover:text-white"
+                  className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-zinc-300 hover:bg-white/5 hover:text-white"
                   aria-label={
                     unreadNotifications > 0
                       ? `Notifications, ${unreadNotifications} unread`
@@ -338,7 +338,7 @@ export function Navbar({
               ) : null}
 
               {showUserMenu && session ? (
-                <div className="relative hidden md:block" ref={menuRef}>
+                <div className="relative" ref={menuRef}>
                   <button
                     type="button"
                     onClick={() => setMenuOpen((v) => !v)}
@@ -393,18 +393,18 @@ export function Navbar({
               ) : showUserMenu ? (
                 <Link
                   href="/login?next=/profile"
-                  className="hidden md:inline-flex h-9 items-center rounded-xl border border-white/15 px-3 text-xs font-medium text-zinc-200 hover:bg-white/5"
+                  className="inline-flex h-9 items-center rounded-xl border border-white/15 px-3 text-xs font-medium text-zinc-200 hover:bg-white/5"
                 >
                   Sign in
                 </Link>
               ) : null}
             </div>
 
-            {/* Mobile toggle */}
+            {/* Mobile / tablet toggle (< lg) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "md:hidden ml-auto p-2 rounded-full text-white hover:bg-white/10",
+                "lg:hidden ml-auto p-2 rounded-full text-white hover:bg-white/10",
                 "focus:outline-none focus:ring-2 focus:ring-sky-400",
                 "min-w-[44px] min-h-[44px] flex items-center justify-center"
               )}
@@ -425,7 +425,7 @@ export function Navbar({
           pointerEvents: isMobileMenuOpen ? "auto" : "none",
         }}
         transition={{ duration: duration.normal }}
-        className="fixed inset-0 z-40 md:hidden"
+        className="fixed inset-0 z-[90] lg:hidden"
       >
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"

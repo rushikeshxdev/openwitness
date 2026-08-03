@@ -64,12 +64,4 @@ export function AppShell({
   );
 }
 
-/** Shared top-nav links for Evidence suite pages */
-export const EVIDENCE_SUITE_NAV = [
-  { label: "Explore", href: "/events" },
-  { label: "Map", href: "/map" },
-  { label: "Evidence", href: "/evidence" },
-  { label: "Reports", href: "/reports" },
-  { label: "Organizations", href: "/organizations" },
-  { label: "About", href: "/#about" },
-] as const;
+export { EVIDENCE_SUITE_NAV } from "./evidence-suite-nav";

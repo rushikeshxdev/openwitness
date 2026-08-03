@@ -301,7 +301,7 @@ export function SearchModal({
     /Mac|iPhone|iPad/.test(navigator.platform);
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-start justify-center px-3 pt-[8vh] sm:px-4 sm:pt-[10vh]">
+    <div className="fixed inset-0 z-[120] flex items-start justify-center px-3 pt-[8vh] sm:px-4 sm:pt-[10vh]">
       <button
         type="button"
         className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"

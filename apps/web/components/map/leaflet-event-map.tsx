@@ -200,15 +200,15 @@ export function LeafletEventMap({
   };
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden bg-[#0B0E11]", className)}>
+    <div className={cn("relative z-0 isolate h-full w-full overflow-hidden bg-[#0B0E11]", className)}>
       <div
         ref={containerRef}
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 z-0 h-full w-full"
         aria-label={ariaLabel}
         role="application"
       />
       {showZoomControls && (
-        <div className="pointer-events-none absolute bottom-3 right-3 z-[1000]">
+        <div className="pointer-events-none absolute bottom-3 right-3 z-10">
           <div className="pointer-events-auto flex flex-col gap-1 rounded-xl border border-white/12 bg-[#121214]/90 p-1.5 backdrop-blur-md">
             <button
               type="button"

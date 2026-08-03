@@ -14,6 +14,7 @@ import {
   Settings,
   Building2,
   CalendarDays,
+  ShieldCheck,
 } from "lucide-react";
 
 const NAV_ITEMS: Array<{
@@ -33,6 +34,12 @@ const NAV_ITEMS: Array<{
     label: "Organizations",
     href: "/organizations",
     icon: Building2,
+  },
+  {
+    id: "verification",
+    label: "Verification",
+    href: "/verification",
+    icon: ShieldCheck,
   },
   { id: "timeline", label: "Timeline", href: "/events", icon: Clock },
   {
@@ -62,6 +69,11 @@ function isActive(pathname: string, href: string, id: string): boolean {
   }
   if (id === "reports") {
     return pathname === "/reports" || pathname.startsWith("/reports/");
+  }
+  if (id === "verification") {
+    return (
+      pathname === "/verification" || pathname.startsWith("/verification/")
+    );
   }
   if (id === "overview") return pathname === "/";
   if (id === "timeline") return false; // shared /events href; don't steal Events active

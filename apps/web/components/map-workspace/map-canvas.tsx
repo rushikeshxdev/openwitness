@@ -187,19 +187,19 @@ export function MapCanvas({
   return (
     <div
       className={cn(
-        "absolute inset-0 h-full min-h-[360px] w-full overflow-hidden bg-[#0B0E11]",
+        "absolute inset-0 z-0 isolate h-full min-h-[360px] w-full overflow-hidden bg-[#0B0E11]",
         className
       )}
     >
       <div
         ref={containerRef}
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 z-0 h-full w-full"
         aria-label="Global events map"
         role="application"
       />
 
       {/* Legend */}
-      <div className="pointer-events-none absolute bottom-3 left-1/2 z-[1000] hidden -translate-x-1/2 sm:bottom-4 sm:block">
+      <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 hidden -translate-x-1/2 sm:bottom-4 sm:block">
         <div className="pointer-events-auto flex items-center gap-5 rounded-xl border border-white/12 bg-[#121214]/90 px-5 py-2.5 backdrop-blur-md">
           {MAP_STATUS_OPTIONS.map((s) => (
             <div key={s.id} className="flex items-center gap-2 text-sm text-zinc-300">
@@ -222,7 +222,7 @@ export function MapCanvas({
       </div>
 
       {/* Controls */}
-      <div className="pointer-events-none absolute bottom-3 right-3 z-[1000] sm:bottom-4 sm:right-4">
+      <div className="pointer-events-none absolute bottom-3 right-3 z-10 sm:bottom-4 sm:right-4">
         <div className="pointer-events-auto flex flex-col gap-1 rounded-xl border border-white/12 bg-[#121214]/90 p-1.5 backdrop-blur-md">
           <button
             type="button"

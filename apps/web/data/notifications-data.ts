@@ -135,8 +135,8 @@ export function getSeedNotifications(): AppNotification[] {
         ],
         primaryCta: { label: "View Evidence", href: EVIDENCE_HREF },
         secondaryCta: {
-          label: "View All Verifications",
-          href: `${EVIDENCE_HREF}#verifications`,
+          label: "Open Verification Dashboard",
+          href: "/verification",
         },
       },
     },

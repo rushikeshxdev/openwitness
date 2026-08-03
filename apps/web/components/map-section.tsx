@@ -79,7 +79,7 @@ export function MapSection({
           variants={fadeIn}
           initial="initial"
           animate={isInView ? "animate" : "initial"}
-          className="relative w-full aspect-[2/1] max-h-[600px] rounded-2xl overflow-hidden bg-background-elevated border border-white/5"
+          className="relative w-full aspect-[2/1] max-h-[600px] rounded-2xl overflow-hidden bg-background-elevated border border-white/5 z-0 isolate"
         >
           <LeafletEventMapClient
             markers={markers}

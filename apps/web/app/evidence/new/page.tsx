@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { AddEvidenceWizard } from "@/components/evidence-explorer/add-evidence-wizard";
-import { EVIDENCE_SUITE_NAV } from "@/components/app-shell/app-shell";
+import { EVIDENCE_SUITE_NAV } from "@/components/app-shell/evidence-suite-nav";
 import {
   footerLinkColumns,
   footerSocialLinks,

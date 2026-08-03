@@ -54,6 +54,7 @@ const navLinks = [
   { label: "Explore", href: "/events" },
   { label: "Map", href: "/map" },
   { label: "Organizations", href: "/organizations" },
+  { label: "Verification", href: "/verification" },
   { label: "About", href: "#about" },
 ] as const;
 

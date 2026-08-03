@@ -100,7 +100,7 @@ export function MapWorkspaceView() {
   }, [selectedEventId, filtered]);
 
   return (
-    <div className="relative flex h-dvh min-h-[640px] flex-col gap-2.5 px-2 pb-2.5 pt-[4.75rem] sm:gap-3 sm:px-3 sm:pb-3 sm:pt-20 md:px-4 lg:gap-3.5 lg:px-4 xl:px-5">
+    <div className="relative flex h-dvh min-h-[640px] flex-col gap-2.5 px-2 pb-2.5 pt-[5.5rem] sm:gap-3 sm:px-3 sm:pb-3 sm:pt-24 md:px-4 lg:gap-3.5 lg:px-4 xl:px-5">
       {/* Mobile toolbar */}
       <div className="flex shrink-0 gap-2 lg:hidden">
         <button

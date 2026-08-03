@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ReportsView } from "@/components/reports/reports-view";
-import { EVIDENCE_SUITE_NAV } from "@/components/app-shell/app-shell";
+import { EVIDENCE_SUITE_NAV } from "@/components/app-shell/evidence-suite-nav";
 import {
   footerLinkColumns,
   footerSocialLinks,

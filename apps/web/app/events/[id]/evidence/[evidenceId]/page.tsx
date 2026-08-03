@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { EvidenceDetailView } from "@/components/evidence-detail/evidence-detail-view";
+import { EVIDENCE_SUITE_NAV } from "@/components/app-shell/evidence-suite-nav";
 import {
   buildEvidenceDetail,
   getEvidenceStaticParams,
@@ -16,15 +17,6 @@ import type { Metadata } from "next";
 export function generateStaticParams() {
   return getEvidenceStaticParams();
 }
-
-const navLinks = [
-  { label: "Explore", href: "/events" },
-  { label: "Map", href: "/map" },
-  { label: "Evidence", href: "/evidence" },
-  { label: "Reports", href: "/reports" },
-  { label: "Organizations", href: "/organizations" },
-  { label: "About", href: "/#about" },
-] as const;
 
 type Props = {
   params: Promise<{ id: string; evidenceId: string }>;
@@ -48,7 +40,7 @@ export default async function EvidenceDetailPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#0B0E11] text-text-primary">
       <Navbar
-        links={[...navLinks]}
+        links={[...EVIDENCE_SUITE_NAV]}
         ctaButton={{
           label: "Report Incident",
           href: "/report",

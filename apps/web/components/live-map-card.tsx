@@ -63,7 +63,7 @@ export function LiveMapCard({ href = "#map", className }: LiveMapCardProps) {
           </span>
         </div>
 
-        <div className="relative flex-1 self-stretch min-h-[136px] rounded-lg overflow-hidden border border-white/8 bg-[#0B0E11] pointer-events-none">
+        <div className="relative flex-1 self-stretch min-h-[136px] z-0 isolate rounded-lg overflow-hidden border border-white/8 bg-[#0B0E11] pointer-events-none">
           <LeafletEventMapClient
             markers={markers}
             cluster
