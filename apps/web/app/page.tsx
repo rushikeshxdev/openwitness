@@ -9,7 +9,7 @@ import { Container } from "@/components/container";
 import { Timeline } from "@/components/timeline";
 import { recentTimelineData } from "@/data/timeline-data";
 import { Organizations } from "@/components/organizations";
-import { organizationsData } from "@/data/organizations-data";
+import { trustedOrganizationsData } from "@/data/trusted-organizations-data";
 import { Footer } from "@/components/footer";
 import {
   footerLinkColumns,
@@ -53,7 +53,7 @@ const MapSection = dynamic(
 const navLinks = [
   { label: "Explore", href: "/events" },
   { label: "Map", href: "/map" },
-  { label: "Organizations", href: "#organizations" },
+  { label: "Organizations", href: "/organizations" },
   { label: "About", href: "#about" },
 ] as const;
 
@@ -151,9 +151,10 @@ export default function HomePage() {
         {/* 4. Trusted by — mockup closing strip */}
         <div id="organizations">
           <Organizations
-            organizations={organizationsData}
+            organizations={trustedOrganizationsData}
             title="Trusted by organizations and communities"
             subtitle=""
+            viewAllHref="/organizations"
             className="py-16 md:py-20"
           />
         </div>

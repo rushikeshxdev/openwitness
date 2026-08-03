@@ -18,7 +18,7 @@ export function generateStaticParams() {
 const navLinks = [
   { label: "Explore", href: "/events" },
   { label: "Map", href: "/map" },
-  { label: "Organizations", href: "/#organizations" },
+  { label: "Organizations", href: "/organizations" },
   { label: "About", href: "/#about" },
 ] as const;
 

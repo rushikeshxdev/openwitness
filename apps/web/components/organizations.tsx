@@ -1,43 +1,28 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import Link from "next/link";
+import { useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { OrganizationCard } from "./organization-card";
 import { Container } from "./container";
 import { staggerContainer, fadeUp } from "@/lib/animations";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import type { TrustedOrganization } from "@/data/trusted-organizations-data";
 
 /**
- * Organizations component displaying partner organization logos in a responsive grid
- * Features staggered entrance animations and responsive column layout
- * 
- * **Validates: Requirements 6.1, 6.4, 6.5**
- * 
- * @example
- * ```tsx
- * <Organizations
- *   organizations={[
- *     { id: "1", name: "Partner A", logoUrl: "/logos/a.png" },
- *     { id: "2", name: "Partner B", logoUrl: "/logos/b.png", website: "https://b.com" },
- *   ]}
- * />
- * ```
+ * Landing Trusted-by strip — compact org grid linking to /organizations
  */
 
 export interface OrganizationsProps {
-  /** Array of organization data */
-  organizations: Array<{
-    id: string;
-    name: string;
-    logoUrl: string;
-    website?: string;
-  }>;
-  /** Optional section title (defaults to "Trusted By") */
+  organizations: Array<
+    Pick<TrustedOrganization, "id" | "name" | "initials" | "accent"> & {
+      category?: string;
+    }
+  >;
   title?: string;
-  /** Optional section subtitle */
   subtitle?: string;
-  /** Additional CSS classes */
+  viewAllHref?: string;
   className?: string;
 }
 
@@ -45,6 +30,7 @@ export function Organizations({
   organizations,
   title = "Trusted By",
   subtitle = "Organizations using OpenWitness to preserve truth",
+  viewAllHref = "/organizations",
   className,
 }: OrganizationsProps) {
   const ref = useRef(null);
@@ -73,21 +59,34 @@ export function Organizations({
           animate={isInView ? "animate" : "initial"}
           className={cn(
             "grid gap-3 md:gap-4 mt-10 md:mt-12",
-            "grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+            "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
           )}
         >
           {organizations.map((organization) => (
             <motion.div key={organization.id} variants={fadeUp}>
-              <OrganizationCard organization={organization} />
+              <OrganizationCard
+                organization={organization}
+                href={viewAllHref}
+              />
             </motion.div>
           ))}
         </motion.div>
 
-        {organizations.length === 0 && (
+        {organizations.length === 0 ? (
           <div className="mt-12 text-center">
             <p className="text-text-secondary text-lg">
               No organizations to display
             </p>
+          </div>
+        ) : (
+          <div className="mt-8 flex justify-center">
+            <Link
+              href={viewAllHref}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#60A5FA] hover:text-white transition-colors"
+            >
+              View all organizations
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </Link>
           </div>
         )}
       </Container>

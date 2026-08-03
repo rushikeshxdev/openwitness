@@ -1,7 +1,6 @@
-import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { ExploreEventsView } from "@/components/explore/explore-events-view";
+import { OrganizationsView } from "@/components/organizations/organizations-view";
 import {
   footerLinkColumns,
   footerSocialLinks,
@@ -10,9 +9,9 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Explore Events – OpenWitness",
+  title: "Trusted Organizations – OpenWitness",
   description:
-    "Discover, document and verify public events happening around the world.",
+    "Organizations working towards transparency, justice and accountability.",
 };
 
 const navLinks = [
@@ -22,11 +21,11 @@ const navLinks = [
   { label: "About", href: "/#about" },
 ] as const;
 
-export default function ExploreEventsPage() {
+export default function OrganizationsPage() {
   return (
     <div className="min-h-screen bg-[#0B0E11] text-text-primary">
       <a
-        href="#explore-main"
+        href="#organizations-main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white"
       >
         Skip to content
@@ -42,14 +41,8 @@ export default function ExploreEventsPage() {
         showUserMenu
       />
 
-      <main id="explore-main">
-        <Suspense
-          fallback={
-            <div className="min-h-[60vh] animate-pulse bg-white/5" aria-hidden />
-          }
-        >
-          <ExploreEventsView />
-        </Suspense>
+      <main id="organizations-main">
+        <OrganizationsView />
       </main>
 
       <Footer

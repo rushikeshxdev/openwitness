@@ -145,7 +145,7 @@ export function getSeedNotifications(): AppNotification[] {
       category: "updates",
       body: "Human Rights Watch started following your contributions.",
       highlight: "Human Rights Watch",
-      highlightHref: "/#organizations",
+      highlightHref: "/organizations",
       timeLabel: "9:05 AM",
       createdAt: atHoursAgo(4),
       unread: true,
@@ -230,7 +230,7 @@ export function getSeedNotifications(): AppNotification[] {
       category: "mentions",
       body: "@rushikesh_dev was tagged in an organization update from Civic Watch.",
       highlight: "Civic Watch",
-      highlightHref: "/#organizations",
+      highlightHref: "/organizations",
       timeLabel: "Yesterday",
       createdAt: atDaysAgo(1, 11),
       unread: true,
@@ -239,7 +239,7 @@ export function getSeedNotifications(): AppNotification[] {
         headline: "Mention in organization update",
         summary:
           "Civic Watch tagged you in an update about community verification coverage.",
-        primaryCta: { label: "Explore Organizations", href: "/#organizations" },
+        primaryCta: { label: "Explore Organizations", href: "/organizations" },
       },
     },
     {
