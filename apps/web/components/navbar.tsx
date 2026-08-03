@@ -19,6 +19,7 @@ import {
 } from "@/lib/notifications-store";
 import { NOTIFICATIONS_PATH } from "@/data/notifications-data";
 import Link from "next/link";
+import { SearchModal } from "@/components/search/search-modal";
 
 export interface NavbarLink {
   label: string;
@@ -53,13 +54,12 @@ export function Navbar({
   links,
   ctaButton,
   showSearch = true,
-  searchPlaceholder = "Search events, places, incidents...",
+  searchPlaceholder = "Search events, evidence, organizations, people...",
   showUserMenu = false,
   className,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [session, setSession] = useState<MockSessionUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -127,26 +127,41 @@ export function Navbar({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        document.getElementById("navbar-search")?.focus();
+        if (showSearch) setSearchOpen(true);
       }
-      if (e.key === "Escape") setIsMobileMenuOpen(false);
+      if (e.key === "Escape") {
+        setIsMobileMenuOpen(false);
+        if (searchOpen) {
+          setSearchOpen(false);
+          window.setTimeout(() => {
+            document.getElementById("navbar-search")?.focus();
+          }, 0);
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [showSearch, searchOpen]);
 
   const handleLinkClick = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
 
+  const openSearch = useCallback(() => {
+    setSearchOpen(true);
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    window.setTimeout(() => {
+      document.getElementById("navbar-search")?.focus();
+    }, 0);
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const q = searchQuery.trim();
-    const href = q
-      ? `/events?q=${encodeURIComponent(q)}`
-      : "/events";
-    window.location.href = href;
-    setIsMobileMenuOpen(false);
+    openSearch();
   };
 
   return (
@@ -231,7 +246,7 @@ export function Navbar({
                     "border border-white/10",
                     "bg-white/[0.07]",
                     "transition-all duration-200",
-                    isSearchFocused &&
+                    searchOpen &&
                       "border-sky-400/35 ring-2 ring-sky-400/15 bg-white/[0.1]"
                   )}
                 >
@@ -242,18 +257,27 @@ export function Navbar({
                   <input
                     id="navbar-search"
                     type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setIsSearchFocused(false)}
+                    readOnly
+                    value=""
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      openSearch();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openSearch();
+                      }
+                    }}
                     placeholder={searchPlaceholder}
                     className={cn(
-                      "w-full h-full bg-transparent",
+                      "w-full h-full bg-transparent cursor-pointer",
                       "pl-9 pr-14 text-[12px] lg:text-[13px] text-zinc-200",
                       "placeholder:text-zinc-500",
                       "focus:outline-none rounded-full"
                     )}
-                    aria-label="Search events, places, incidents"
+                    aria-label="Search events, evidence, organizations, people"
+                    aria-haspopup="dialog"
                   />
                   <kbd
                     className="absolute right-2 inline-flex items-center rounded-md border border-white/10 bg-black/30 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400"
@@ -427,11 +451,22 @@ export function Navbar({
                   />
                   <input
                     type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    readOnly
+                    value=""
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      openSearch();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openSearch();
+                      }
+                    }}
                     placeholder={searchPlaceholder}
-                    className="w-full h-full bg-transparent pl-9 pr-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none rounded-full"
-                    aria-label="Search events, places, incidents"
+                    className="w-full h-full bg-transparent cursor-pointer pl-9 pr-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none rounded-full"
+                    aria-label="Search events, evidence, organizations, people"
+                    aria-haspopup="dialog"
                   />
                 </div>
               </form>
@@ -532,6 +567,13 @@ export function Navbar({
           </div>
         </motion.div>
       </motion.div>
+
+      {showSearch && (
+        <SearchModal
+          open={searchOpen}
+          onClose={closeSearch}
+        />
+      )}
     </>
   );
 }
