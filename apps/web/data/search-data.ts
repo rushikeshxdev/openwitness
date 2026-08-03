@@ -233,7 +233,7 @@ function buildOrgResults(): SearchResultItem[] {
     id: `org-${o.id}`,
     kind: "organization" as const,
     title: o.name,
-    href: "/organizations",
+    href: `/organizations/${o.id}`,
     meta: o.category,
     initials: o.initials,
     accent: o.accent,

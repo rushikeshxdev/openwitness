@@ -24,14 +24,15 @@ export interface OrganizationCardProps {
 
 function OrganizationCardComponent({
   organization,
-  href = "/organizations",
+  href,
   className,
 }: OrganizationCardProps) {
-  const { name, initials, accent, category } = organization;
+  const { id, name, initials, accent, category } = organization;
+  const targetHref = href ?? `/organizations/${id}`;
 
   return (
     <Link
-      href={href}
+      href={targetHref}
       className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary rounded-xl"
       aria-label={`View ${name} on Organizations`}
     >

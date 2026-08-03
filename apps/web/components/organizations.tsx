@@ -11,7 +11,7 @@ import { staggerContainer, fadeUp } from "@/lib/animations";
 import type { TrustedOrganization } from "@/data/trusted-organizations-data";
 
 /**
- * Landing Trusted-by strip — compact org grid linking to /organizations
+ * Landing Trusted-by strip — compact org grid linking to org profiles
  */
 
 export interface OrganizationsProps {
@@ -64,10 +64,7 @@ export function Organizations({
         >
           {organizations.map((organization) => (
             <motion.div key={organization.id} variants={fadeUp}>
-              <OrganizationCard
-                organization={organization}
-                href={viewAllHref}
-              />
+              <OrganizationCard organization={organization} />
             </motion.div>
           ))}
         </motion.div>

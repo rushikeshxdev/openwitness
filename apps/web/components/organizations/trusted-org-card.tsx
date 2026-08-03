@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "@/components/glass-card";
 import type { TrustedOrganization } from "@/data/trusted-organizations-data";
@@ -13,7 +14,9 @@ export interface TrustedOrgCardProps {
 
 export function TrustedOrgCard({ organization, className }: TrustedOrgCardProps) {
   const [following, setFollowing] = useState(false);
-  const { name, category, eventCount, verified, initials, accent } = organization;
+  const { id, name, category, eventCount, verified, initials, accent } =
+    organization;
+  const href = `/organizations/${id}`;
 
   return (
     <GlassCard
@@ -23,43 +26,51 @@ export function TrustedOrgCard({ organization, className }: TrustedOrgCardProps)
         className
       )}
     >
-      <div className="flex items-center gap-3.5 min-w-0">
+      <Link
+        href={href}
+        className="flex min-w-0 items-center gap-3.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+        aria-label={`View ${name} profile`}
+      >
         <div
-          className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full text-sm sm:text-base font-bold text-white shadow-inner"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-inner sm:h-14 sm:w-14 sm:text-base"
           style={{ backgroundColor: accent }}
           aria-hidden="true"
         >
           {initials}
         </div>
         <div className="min-w-0">
-          <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+          <h3 className="truncate text-base font-semibold text-white sm:text-lg">
             {name}
           </h3>
-          <p className="text-sm text-zinc-400 truncate">{category}</p>
+          <p className="truncate text-sm text-zinc-400">{category}</p>
         </div>
-      </div>
+      </Link>
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-300 tabular-nums">
+        <p className="text-sm tabular-nums text-zinc-300">
           <span className="font-semibold text-white">{eventCount}</span> Events
         </p>
         {verified && (
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+          <Link
+            href={href}
+            className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
             aria-label={`${name} is verified`}
           >
             <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             Verified
             <ChevronRight className="h-3.5 w-3.5 opacity-70" aria-hidden="true" />
-          </button>
+          </Link>
         )}
       </div>
 
       <button
         type="button"
         aria-pressed={following}
-        onClick={() => setFollowing((v) => !v)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setFollowing((v) => !v);
+        }}
         className={cn(
           "inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors",
           following

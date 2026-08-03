@@ -36,12 +36,12 @@ describe("OrganizationCard", () => {
     expect(screen.getByText("A")).toBeInTheDocument();
   });
 
-  it("links to organizations page by default", () => {
+  it("links to organization profile by default", () => {
     render(<OrganizationCard organization={mockOrganization} />);
     const link = screen.getByRole("link", {
       name: /view amnesty on organizations/i,
     });
-    expect(link).toHaveAttribute("href", "/organizations");
+    expect(link).toHaveAttribute("href", "/organizations/amnesty");
   });
 
   it("supports custom href", () => {

@@ -35,13 +35,14 @@ export const ORGANIZATION_CATEGORIES: Array<OrganizationCategory | "all"> = [
 export const trustedOrganizationsData: TrustedOrganization[] = [
   {
     id: "amnesty",
-    name: "Amnesty",
+    name: "Amnesty International India",
     category: "Human Rights Organization",
     eventCount: 120,
     verified: true,
     initials: "A",
     accent: "#F59E0B",
     description: "Global human rights documentation and advocacy.",
+    website: "https://www.amnesty.org.in",
   },
   {
     id: "human-rights",
@@ -117,6 +118,12 @@ export const trustedOrganizationsData: TrustedOrganization[] = [
 
 export function getTrustedOrganizations(): TrustedOrganization[] {
   return trustedOrganizationsData;
+}
+
+export function getTrustedOrganizationById(
+  id: string
+): TrustedOrganization | undefined {
+  return trustedOrganizationsData.find((o) => o.id === id);
 }
 
 export function filterTrustedOrganizations(
