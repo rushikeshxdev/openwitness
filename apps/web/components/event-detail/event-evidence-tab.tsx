@@ -6,8 +6,9 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "@/components/glass-card";
 import { listEvidenceForEvent } from "@/data/evidence-detail-data";
+import { compareHref } from "@/data/compare-evidence-data";
 import type { EventDetailViewModel } from "@/data/event-detail-data";
-import { BadgeCheck, ExternalLink, Plus } from "lucide-react";
+import { BadgeCheck, ExternalLink, GitCompareArrows, Plus } from "lucide-react";
 
 export function EventEvidenceTab({
   detail,
@@ -33,6 +34,20 @@ export function EventEvidenceTab({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {items.length >= 2 ? (
+            <Link
+              href={compareHref(
+                items.slice(0, 5).map((item) => ({
+                  eventId: detail.id,
+                  evidenceId: item.id,
+                }))
+              )}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/12 px-3.5 py-2.5 text-sm font-medium text-zinc-200 hover:bg-white/5"
+            >
+              <GitCompareArrows className="h-3.5 w-3.5" aria-hidden="true" />
+              Compare
+            </Link>
+          ) : null}
           <Link
             href="/evidence"
             className="inline-flex items-center gap-1.5 rounded-xl border border-white/12 px-3.5 py-2.5 text-sm font-medium text-zinc-200 hover:bg-white/5"

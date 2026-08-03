@@ -17,7 +17,13 @@ import {
   type EvidenceSort,
   type EvidenceTimeRange,
 } from "@/data/evidence-explorer-data";
-import { Plus, SlidersHorizontal, X } from "lucide-react";
+import {
+  compareHref,
+  MAX_COMPARE_SLOTS,
+  MIN_COMPARE_SLOTS,
+  type CompareIdPair,
+} from "@/data/compare-evidence-data";
+import { GitCompareArrows, Plus, SlidersHorizontal, X } from "lucide-react";
 
 const MEDIA_OPTIONS: Array<{ id: EvidenceMediaType | "all"; label: string }> = [
   { id: "all", label: "All media" },
@@ -47,6 +53,7 @@ export function EvidenceExplorerView() {
   const [filters, setFilters] =
     useState<EvidenceExplorerFilters>(defaultEvidenceFilters);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [selected, setSelected] = useState<CompareIdPair[]>([]);
   const eventOptions = useMemo(() => getEvidenceEventOptions(), []);
   const tagOptions = useMemo(() => getEvidenceTagOptions(), []);
 
@@ -54,6 +61,24 @@ export function EvidenceExplorerView() {
     () => filterEvidenceItems(evidenceExplorerData, filters),
     [filters]
   );
+
+  const selectedKeys = useMemo(
+    () => new Set(selected.map((p) => `${p.eventId}:${p.evidenceId}`)),
+    [selected]
+  );
+
+  const toggleSelect = (pair: CompareIdPair) => {
+    const key = `${pair.eventId}:${pair.evidenceId}`;
+    setSelected((prev) => {
+      if (prev.some((p) => `${p.eventId}:${p.evidenceId}` === key)) {
+        return prev.filter((p) => `${p.eventId}:${p.evidenceId}` !== key);
+      }
+      if (prev.length >= MAX_COMPARE_SLOTS) return prev;
+      return [...prev, pair];
+    });
+  };
+
+  const canCompareSelected = selected.length >= MIN_COMPARE_SLOTS;
 
   const patch = (p: Partial<EvidenceExplorerFilters>) =>
     setFilters((f) => ({ ...f, ...p }));
@@ -110,13 +135,26 @@ export function EvidenceExplorerView() {
               ))}
             </div>
           </div>
-          <Link
-            href="/evidence/new"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#3B82F6] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563EB] transition-colors"
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Add New Evidence
-          </Link>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <Link
+              href={
+                canCompareSelected ? compareHref(selected) : "/evidence/compare"
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-white/[0.08]"
+            >
+              <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+              {canCompareSelected
+                ? `Compare selected (${selected.length})`
+                : "Compare Evidence"}
+            </Link>
+            <Link
+              href="/evidence/new"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#3B82F6] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563EB] transition-colors"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Add New Evidence
+            </Link>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-white/12 bg-[#121214]/90 p-3 sm:p-4 space-y-3">
@@ -238,17 +276,57 @@ export function EvidenceExplorerView() {
           ) : null}
         </div>
 
-        <p className="text-sm text-zinc-500">
-          Showing{" "}
-          <span className="text-zinc-300 tabular-nums">{filtered.length}</span>{" "}
-          item{filtered.length === 1 ? "" : "s"}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-zinc-500">
+            Showing{" "}
+            <span className="tabular-nums text-zinc-300">{filtered.length}</span>{" "}
+            item{filtered.length === 1 ? "" : "s"}
+            {selected.length > 0 ? (
+              <>
+                {" "}
+                ·{" "}
+                <span className="tabular-nums text-[#93C5FD]">
+                  {selected.length}
+                </span>{" "}
+                selected for compare
+              </>
+            ) : (
+              <span className="text-zinc-600">
+                {" "}
+                · select 2–{MAX_COMPARE_SLOTS} to compare
+              </span>
+            )}
+          </p>
+          {selected.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => setSelected([])}
+              className="text-sm text-zinc-400 hover:text-white"
+            >
+              Clear selection
+            </button>
+          ) : null}
+        </div>
 
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map((item) => (
-              <EvidenceExplorerCard key={item.id} item={item} />
-            ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((item) => {
+              const key = `${item.eventId}:${item.evidenceId}`;
+              return (
+                <EvidenceExplorerCard
+                  key={item.id}
+                  item={item}
+                  selectable
+                  selected={selectedKeys.has(key)}
+                  onToggleSelect={() =>
+                    toggleSelect({
+                      eventId: item.eventId,
+                      evidenceId: item.evidenceId,
+                    })
+                  }
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-black/35 px-6 py-16 text-center">

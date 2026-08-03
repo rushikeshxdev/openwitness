@@ -10,6 +10,7 @@ import {
   type EvidenceDetailViewModel,
   type EvidenceNavSection,
 } from "@/data/evidence-detail-data";
+import { compareHref } from "@/data/compare-evidence-data";
 import {
   BadgeCheck,
   Calendar,
@@ -19,6 +20,7 @@ import {
   FileText,
   Film,
   FolderPlus,
+  GitCompareArrows,
   History,
   Info,
   Link2,
@@ -742,6 +744,23 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
 
           {nav === "related" ? (
             <Panel title="Related Evidence">
+              {detail.related.length > 0 ? (
+                <div className="border-b border-white/10 px-3 py-2.5">
+                  <Link
+                    href={compareHref([
+                      { eventId: detail.eventId, evidenceId: detail.id },
+                      ...detail.related.slice(0, 2).map((item) => ({
+                        eventId: detail.eventId,
+                        evidenceId: item.id,
+                      })),
+                    ])}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#60A5FA] hover:text-[#93C5FD]"
+                  >
+                    <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+                    Compare with related
+                  </Link>
+                </div>
+              ) : null}
               <ul className="divide-y divide-white/10">
                 {detail.related.map((item) => (
                   <li key={item.id}>
@@ -949,41 +968,58 @@ export function EvidenceDetailView({ detail }: EvidenceDetailViewProps) {
                 No related evidence yet.
               </p>
             ) : (
-              <ul className="divide-y divide-white/10">
-                {detail.related.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={`/events/${detail.eventId}/evidence/${item.id}`}
-                      className="flex gap-3 px-3 py-3 hover:bg-white/[0.03] transition-colors min-h-[4.5rem]"
-                    >
-                      <div className="relative h-14 w-[72px] shrink-0 rounded-md overflow-hidden border border-white/10">
-                        <Image
-                          src={item.thumbnailUrl}
-                          alt=""
-                          fill
-                          loading="lazy"
-                          className="object-cover"
-                          sizes="72px"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-white line-clamp-1">
-                          {item.title}
-                        </p>
-                        <p className="mt-0.5 text-[11px] text-zinc-500">
-                          {item.typeLabel} · {item.duration}
-                        </p>
-                        {item.verified ? (
-                          <span className="mt-1 inline-flex items-center gap-0.5 text-[10px] text-emerald-400">
-                            <BadgeCheck className="w-3 h-3" aria-hidden="true" />
-                            Verified
-                          </span>
-                        ) : null}
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="border-b border-white/10 px-3 py-2.5">
+                  <Link
+                    href={compareHref([
+                      { eventId: detail.eventId, evidenceId: detail.id },
+                      ...detail.related.slice(0, 2).map((item) => ({
+                        eventId: detail.eventId,
+                        evidenceId: item.id,
+                      })),
+                    ])}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#60A5FA] hover:text-[#93C5FD]"
+                  >
+                    <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+                    Compare with related
+                  </Link>
+                </div>
+                <ul className="divide-y divide-white/10">
+                  {detail.related.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={`/events/${detail.eventId}/evidence/${item.id}`}
+                        className="flex gap-3 px-3 py-3 hover:bg-white/[0.03] transition-colors min-h-[4.5rem]"
+                      >
+                        <div className="relative h-14 w-[72px] shrink-0 rounded-md overflow-hidden border border-white/10">
+                          <Image
+                            src={item.thumbnailUrl}
+                            alt=""
+                            fill
+                            loading="lazy"
+                            className="object-cover"
+                            sizes="72px"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white line-clamp-1">
+                            {item.title}
+                          </p>
+                          <p className="mt-0.5 text-[11px] text-zinc-500">
+                            {item.typeLabel} · {item.duration}
+                          </p>
+                          {item.verified ? (
+                            <span className="mt-1 inline-flex items-center gap-0.5 text-[10px] text-emerald-400">
+                              <BadgeCheck className="w-3 h-3" aria-hidden="true" />
+                              Verified
+                            </span>
+                          ) : null}
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </Panel>
         </aside>
