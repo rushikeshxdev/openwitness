@@ -1,12 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import { GlassCard } from "./glass-card";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { LeafletEventMapClient } from "@/components/map/leaflet-event-map-client";
+import type { LeafletMapMarker } from "@/components/map/leaflet-event-map";
+import { mapEventsData } from "@/data/map-data";
 
 /**
- * Live Map Card — text left, dotted world map right (mockup)
+ * Live Map Card — copy left, real Leaflet preview right
  */
 
 export interface LiveMapCardProps {
@@ -14,77 +18,19 @@ export interface LiveMapCardProps {
   className?: string;
 }
 
-const HOTSPOTS = [
-  { cx: 22, cy: 34, r: 2.6 },
-  { cx: 28, cy: 52, r: 2.0 },
-  { cx: 48, cy: 28, r: 2.4 },
-  { cx: 52, cy: 48, r: 1.9 },
-  { cx: 72, cy: 34, r: 2.8 },
-  { cx: 80, cy: 42, r: 2.1 },
-] as const;
-
-function buildWorldDots(): ReadonlyArray<{ x: number; y: number }> {
-  const dots: Array<{ x: number; y: number }> = [];
-  for (let y = 8; y <= 78; y += 3.2) {
-    for (let x = 4; x <= 96; x += 3.2) {
-      const inAmericas =
-        x >= 8 &&
-        x <= 36 &&
-        y >= 14 &&
-        y <= 70 &&
-        Math.sin((y - 16) * 0.09) * 5 + 18 > x - 10;
-      const inEuropeAfrica =
-        x >= 40 && x <= 58 && y >= 14 && y <= 68 && !(x > 54 && y < 22);
-      const inAsia =
-        x >= 58 && x <= 92 && y >= 14 && y <= 54 && (x < 86 || y < 44);
-      const inOceania = x >= 78 && x <= 94 && y >= 56 && y <= 74;
-
-      if (
-        (inAmericas || inEuropeAfrica || inAsia || inOceania) &&
-        Math.round(x * 7 + y * 13) % 3 !== 0
-      ) {
-        dots.push({ x, y });
-      }
-    }
-  }
-  return dots;
-}
-
-const WORLD_DOTS = buildWorldDots();
-
-function MiniWorldMap() {
-  return (
-    <svg
-      viewBox="0 0 100 80"
-      className="w-full h-full"
-      aria-hidden="true"
-      preserveAspectRatio="xMidYMid meet"
-    >
-      {WORLD_DOTS.map((d, i) => (
-        <circle key={i} cx={d.x} cy={d.y} r={0.5} className="fill-white/25" />
-      ))}
-      {HOTSPOTS.map((h, i) => (
-        <g key={i}>
-          <circle
-            cx={h.cx}
-            cy={h.cy}
-            r={h.r * 2.6}
-            className="fill-[#3B82F6]/20 motion-safe:animate-pulse"
-          />
-          <circle
-            cx={h.cx}
-            cy={h.cy}
-            r={h.r}
-            className="fill-[#3B82F6]"
-            style={{ filter: "drop-shadow(0 0 5px rgba(59,130,246,0.95))" }}
-          />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 export function LiveMapCard({ href = "#map", className }: LiveMapCardProps) {
+  const markers = useMemo<LeafletMapMarker[]>(
+    () =>
+      mapEventsData.map((e) => ({
+        id: e.id,
+        latitude: e.latitude,
+        longitude: e.longitude,
+        title: e.title,
+        status: e.status ?? "verified",
+      })),
+    []
+  );
+
   return (
     <Link
       href={href}
@@ -117,8 +63,15 @@ export function LiveMapCard({ href = "#map", className }: LiveMapCardProps) {
           </span>
         </div>
 
-        <div className="relative flex-1 self-stretch min-h-[136px] rounded-lg overflow-hidden">
-          <MiniWorldMap />
+        <div className="relative flex-1 self-stretch min-h-[136px] rounded-lg overflow-hidden border border-white/8 bg-[#0B0E11] pointer-events-none">
+          <LeafletEventMapClient
+            markers={markers}
+            cluster
+            interactive={false}
+            showZoomControls={false}
+            showAttribution={false}
+            ariaLabel="Live map preview"
+          />
         </div>
       </GlassCard>
     </Link>

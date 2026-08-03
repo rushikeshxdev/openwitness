@@ -35,13 +35,16 @@ describe("LiveMapCard", () => {
     ).toHaveAttribute("href", "/custom-map");
   });
 
-  it("displays map visualization", () => {
-    const { container } = render(<LiveMapCard />);
-    expect(container.querySelector("svg")).toBeInTheDocument();
+  it("shows map preview region", () => {
+    render(<LiveMapCard />);
+    const preview =
+      screen.queryByLabelText("Live map preview") ??
+      screen.queryByText("Loading map…");
+    expect(preview).toBeTruthy();
   });
 
   it("displays arrow icon alongside map", () => {
     const { container } = render(<LiveMapCard />);
-    expect(container.querySelectorAll("svg").length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelector("svg")).toBeInTheDocument();
   });
 });
