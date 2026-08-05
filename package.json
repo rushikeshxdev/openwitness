@@ -15,7 +15,13 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "format": "prettier --write .",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "db:generate": "pnpm --filter @openwitness/db generate",
+    "db:migrate": "pnpm --filter @openwitness/db migrate",
+    "db:migrate:deploy": "pnpm --filter @openwitness/db migrate:deploy",
+    "db:seed": "pnpm --filter @openwitness/db seed",
+    "db:verify": "pnpm --filter @openwitness/db verify",
+    "db:studio": "pnpm --filter @openwitness/db studio"
   },
   "devDependencies": {
     "@vitest/ui": "^4.1.10",

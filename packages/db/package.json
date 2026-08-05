@@ -1,0 +1,41 @@
+{
+  "name": "@openwitness/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prisma schema, client, and seeds for OpenWitness",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "dotenv -e ../../.env -- prisma generate",
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "seed": "dotenv -e ../../.env -- prisma db seed",
+    "verify": "dotenv -e ../../.env -- tsx prisma/verify-seed.ts",
+    "studio": "dotenv -e ../../.env -- prisma studio",
+    "push": "dotenv -e ../../.env -- prisma db push",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "clean": "rimraf dist node_modules/.prisma"
+  },
+  "prisma": {
+    "seed": "dotenv -e ../../.env -- tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "bcryptjs": "^3.0.2",
+    "dotenv-cli": "^10.0.0",
+    "prisma": "^6.19.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.8.2"
+  }
+}

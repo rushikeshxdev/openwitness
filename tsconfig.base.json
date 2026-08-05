@@ -13,6 +13,7 @@
     "incremental": true,
     "noEmit": true,
     "paths": {
+      "@openwitness/db": ["./packages/db/src/index.ts"],
       "@openwitness/types": ["./packages/types/src/index.ts"],
       "@openwitness/utils": ["./packages/utils/src/index.ts"],
       "@openwitness/config": ["./packages/config/src/index.ts"],

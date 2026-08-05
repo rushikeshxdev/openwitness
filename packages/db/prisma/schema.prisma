@@ -1,0 +1,518 @@
+// OpenWitness foundation schema — soft delete + ModuleMatrix RBAC + core domain
+// Mental model: User → ActiveRole → ModuleMatrix → APIs / menu → org-scoped data
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserType {
+  admin
+  staff
+  member
+}
+
+enum Persona {
+  citizen
+  journalist
+  researcher
+  organization
+  volunteer
+  other
+}
+
+enum OrgMemberRole {
+  owner
+  admin
+  editor
+  member
+}
+
+enum NodeType {
+  page
+  tab
+  action
+}
+
+enum EventCategory {
+  protest
+  disaster
+  accident
+  gathering
+  humanitarian
+  other
+}
+
+enum EventLifecycle {
+  draft
+  live
+  ongoing
+  under_review
+  archived
+}
+
+enum ConfidenceStatus {
+  unverified
+  pending
+  verified
+}
+
+enum ImpactLevel {
+  low
+  medium
+  high
+}
+
+enum Visibility {
+  public
+  restricted
+}
+
+enum MediaType {
+  image
+  video
+  audio
+  document
+  text
+}
+
+enum EvidenceStatus {
+  pending
+  under_review
+  verified
+  rejected
+  hidden
+}
+
+enum ReviewLayer {
+  community
+  expert
+  organization
+  technical
+  ai_assist
+}
+
+enum ReviewAction {
+  approve
+  reject
+  skip
+  request_info
+}
+
+enum ReportKind {
+  community
+  official
+}
+
+enum ReportStatus {
+  draft
+  under_review
+  published
+}
+
+enum OrganizationCategory {
+  human_rights
+  independent_media
+  ngo
+  advocacy
+  free_speech
+  other
+}
+
+enum EventRegion {
+  global
+  asia
+  europe
+  americas
+  africa
+  oceania
+}
+
+// ─── Identity & session ──────────────────────────────────────────────────────
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  emailVerifiedAt    DateTime?
+  passwordHash       String?
+  name               String?
+  handle             String?   @unique
+  image              String?
+  bio                String?
+  location           String?
+  language           String?
+  persona            Persona   @default(citizen)
+  userType           UserType  @default(member)
+  trustScore         Int       @default(0)
+  identityVerified   Boolean   @default(false)
+  organizationId     String?
+  activeRoleId       String?
+  sessionId          String?
+  refreshTokenHash   String?
+  failedLoginAttempts Int      @default(0)
+  lockedUntil        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deleted            Boolean   @default(false)
+  createdById        String?
+  updatedById        String?
+
+  organization       Organization? @relation("UserHomeOrg", fields: [organizationId], references: [id], onDelete: SetNull)
+  activeRole         Role?         @relation("UserActiveRole", fields: [activeRoleId], references: [id], onDelete: SetNull)
+  roles              UserRole[]
+  orgMemberships     OrganizationMember[]
+  createdEvents      Event[]              @relation("EventCreator")
+  uploadedEvidence   Evidence[]           @relation("EvidenceUploader")
+  evidenceVersions   EvidenceVersion[]    @relation("EvidenceVersionCreator")
+  reviews            VerificationReview[]
+  reports            Report[]             @relation("ReportAuthor")
+  auditLogs          AuditLog[]           @relation("AuditActor")
+
+  @@index([organizationId])
+  @@index([deleted])
+  @@index([activeRoleId])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  userType    UserType @default(member)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deleted     Boolean  @default(false)
+  createdById String?
+  updatedById String?
+
+  users       UserRole[]
+  activeUsers User[]             @relation("UserActiveRole")
+  mapping     RoleModuleMapping?
+
+  @@index([deleted])
+}
+
+model UserRole {
+  id          String   @id @default(cuid())
+  userId      String
+  roleId      String
+  grantedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deleted     Boolean  @default(false)
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([roleId])
+}
+
+// ─── Catalog & ModuleMatrix ──────────────────────────────────────────────────
+
+model Module {
+  id          String   @id @default(cuid())
+  moduleKey   String   @unique
+  moduleId    Int      @unique
+  name        String
+  path        String
+  icon        String?
+  sortOrder   Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deleted     Boolean  @default(false)
+  createdById String?
+  updatedById String?
+
+  subModules SubModule[]
+
+  @@index([deleted, enabled, sortOrder])
+}
+
+model SubModule {
+  id             String   @id @default(cuid())
+  moduleRefId    String
+  subKey         String
+  permissionPath String
+  name           String
+  path           String?
+  nodeType       NodeType @default(page)
+  sortOrder      Int      @default(0)
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deleted        Boolean  @default(false)
+  createdById    String?
+  updatedById    String?
+
+  module Module @relation(fields: [moduleRefId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleRefId, subKey])
+  @@unique([permissionPath])
+  @@index([moduleRefId])
+}
+
+/// 1:1 with Role — moduleMatrix lists ONLY modules/submodules assigned to that role
+model RoleModuleMapping {
+  id           String   @id @default(cuid())
+  roleId       String   @unique
+  moduleMatrix Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deleted      Boolean  @default(false)
+  createdById  String?
+  updatedById  String?
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+// ─── Organizations ───────────────────────────────────────────────────────────
+
+model Organization {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  name        String
+  fullName    String?
+  tagline     String?
+  bio         String?
+  aboutText   String?
+  category    OrganizationCategory @default(other)
+  website     String?
+  location    String?
+  region      EventRegion?
+  coverUrl    String?
+  logoUrl     String?
+  initials    String?
+  accent      String?
+  verified    Boolean              @default(false)
+  verifiedAt  DateTime?
+  founded     String?
+  focusAreas  String[]             @default([])
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  deleted     Boolean              @default(false)
+  createdById String?
+  updatedById String?
+
+  members  OrganizationMember[]
+  users    User[]               @relation("UserHomeOrg")
+  events   Event[]
+  reports  Report[]
+  reviews  VerificationReview[]
+
+  @@index([deleted])
+  @@index([verified])
+}
+
+model OrganizationMember {
+  id             String        @id @default(cuid())
+  organizationId String
+  userId         String
+  memberRole     OrgMemberRole @default(member)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deleted        Boolean       @default(false)
+  createdById    String?
+  updatedById    String?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+// ─── Domain: Events ──────────────────────────────────────────────────────────
+
+model Event {
+  id               String           @id @default(cuid())
+  title            String
+  description      String?
+  category         EventCategory    @default(other)
+  lifecycle        EventLifecycle   @default(draft)
+  confidence       ConfidenceStatus @default(unverified)
+  impact           ImpactLevel      @default(medium)
+  visibility       Visibility       @default(public)
+  city             String?
+  country          String?
+  region           EventRegion?
+  address          String?
+  latitude         Decimal?         @db.Decimal(10, 7)
+  longitude        Decimal?         @db.Decimal(10, 7)
+  thumbnailUrl     String?
+  aiSummary        String?
+  isTrending       Boolean          @default(false)
+  startedAt        DateTime?
+  endedAt          DateTime?
+  organizationId   String?
+  createdById      String?
+  updatedById      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deleted          Boolean          @default(false)
+  hiddenAt         DateTime?
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  createdBy    User?         @relation("EventCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  evidence     Evidence[]
+  reports      Report[]
+
+  @@index([deleted, lifecycle, startedAt])
+  @@index([region, category])
+  @@index([organizationId])
+  @@index([createdById])
+}
+
+// ─── Domain: Evidence (immutable versions) ───────────────────────────────────
+
+model Evidence {
+  id              String         @id @default(cuid())
+  eventId         String
+  uploadedById    String
+  title           String
+  description     String?
+  context         String?
+  mediaType       MediaType
+  status          EvidenceStatus @default(pending)
+  capturedAt      DateTime?
+  city            String?
+  country         String?
+  latitude        Decimal?       @db.Decimal(10, 7)
+  longitude       Decimal?       @db.Decimal(10, 7)
+  accuracyMeters  Float?
+  sourceLabel     String?
+  sourceDevice    String?
+  attestOriginal  Boolean        @default(false)
+  attestLocation  Boolean        @default(false)
+  attestReview    Boolean        @default(false)
+  currentVersionId String?       @unique
+  organizationId  String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deleted         Boolean        @default(false)
+  hiddenAt        DateTime?
+  createdById     String?
+  updatedById     String?
+
+  event          Event                @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  uploadedBy     User                 @relation("EvidenceUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+  currentVersion EvidenceVersion?     @relation("EvidenceCurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  versions       EvidenceVersion[]    @relation("EvidenceVersions")
+  reviews        VerificationReview[]
+
+  @@index([eventId, deleted])
+  @@index([status, createdAt])
+  @@index([uploadedById])
+}
+
+model EvidenceVersion {
+  id              String   @id @default(cuid())
+  evidenceId      String
+  version         Int
+  storageKey      String
+  url             String?
+  mimeType        String?
+  sizeBytes       BigInt?
+  width           Int?
+  height          Int?
+  durationSeconds Float?
+  sha256          String
+  checksumAlgo    String   @default("sha256")
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deleted         Boolean  @default(false)
+  updatedById     String?
+
+  evidence        Evidence  @relation("EvidenceVersions", fields: [evidenceId], references: [id], onDelete: Restrict)
+  createdBy       User?     @relation("EvidenceVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  currentFor      Evidence? @relation("EvidenceCurrentVersion")
+
+  @@unique([evidenceId, version])
+  @@index([evidenceId])
+  @@index([sha256])
+}
+
+model VerificationReview {
+  id             String       @id @default(cuid())
+  evidenceId     String
+  reviewerId     String
+  organizationId String?
+  layer          ReviewLayer  @default(community)
+  action         ReviewAction
+  statusAfter    EvidenceStatus?
+  notes          String?
+  checklist      Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deleted        Boolean      @default(false)
+  createdById    String?
+  updatedById    String?
+
+  evidence     Evidence      @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  reviewer     User          @relation(fields: [reviewerId], references: [id], onDelete: Restrict)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([evidenceId, createdAt])
+  @@index([reviewerId])
+}
+
+// ─── Domain: Reports ─────────────────────────────────────────────────────────
+
+model Report {
+  id             String       @id @default(cuid())
+  title          String
+  summary        String?
+  kind           ReportKind   @default(community)
+  status         ReportStatus @default(draft)
+  authorId       String
+  organizationId String?
+  eventId        String?
+  thumbnailUrl   String?
+  publishedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deleted        Boolean      @default(false)
+  createdById    String?
+  updatedById    String?
+
+  author       User          @relation("ReportAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([organizationId])
+  @@index([eventId])
+}
+
+// ─── Audit ───────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorId        String?
+  action         String
+  resourceType   String
+  resourceId     String?
+  organizationId String?
+  metadata       Json?
+  ip             String?
+  createdAt      DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([resourceType, resourceId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}

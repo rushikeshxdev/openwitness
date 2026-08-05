@@ -161,3 +161,6 @@ apps/*/dist/
 
 # Logs
 *.log
+
+#Database
+DATABASE_URL=postgresql://neondb_owner:npg_jVyUn9oRdZ4q@ep-green-bar-azlibko1-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
