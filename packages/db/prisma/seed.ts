@@ -2,6 +2,7 @@
  * Seed: Module/SubModule catalog, role matrices (assigned nodes only), admin user.
  * Admin password is for local/dev only — change in any shared environment.
  */
+/// <reference types="node" />
 import { PrismaClient, UserType, type Prisma } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 

@@ -20,7 +20,7 @@
     "verify": "dotenv -e ../../.env -- tsx prisma/verify-seed.ts",
     "studio": "dotenv -e ../../.env -- prisma studio",
     "push": "dotenv -e ../../.env -- prisma db push",
-    "lint": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit && tsc -p prisma/tsconfig.json --noEmit",
     "clean": "rimraf dist node_modules/.prisma"
   },
   "prisma": {
